@@ -1,0 +1,34 @@
+{
+	"name": "Webnative Devtools",
+	"version": "0.0.0",
+	"description": "Tools for the Webnative SDK",
+	"homepage_url": "https://github.com/therealjeffg/webnative-devtools",
+	"manifest_version": 2,
+	"minimum_chrome_version": "74",
+	"devtools_page": "devtools.html",
+	"applications": {
+		"gecko": {
+			"id": "jeff@techno.email",
+			"strict_min_version": "67.0"
+		}
+	},
+	"icons": {
+		"128": "icon.png"
+	},
+	"permissions": [
+		"storage",
+		"http://*/*",
+		"https://*/*",
+		"tabs"
+	],
+	"options_ui": {
+		"browser_style": true,
+		"page": "options.html"
+	},
+	"background": {
+		"persistent": false,
+		"scripts": [
+			"background.js"
+		]
+	}
+}
