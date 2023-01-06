@@ -8,8 +8,8 @@
 
 ### TODOs:
 
- - [] create initial content script
- - [] is webnative loaded?
- - [] are we connected?
- - [] who is connected?
- - [] storage interrogation / get fs object
+ - [ ] create initial content script
+ - [ ] is webnative loaded?
+ - [ ] are we connected?
+ - [ ] who is connected?
+ - [ ] storage interrogation / get fs object
