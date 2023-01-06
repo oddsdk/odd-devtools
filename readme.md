@@ -13,7 +13,3 @@
  - [] are we connected?
  - [] who is connected?
  - [] storage interrogation / get fs object
- 
-
-
-
