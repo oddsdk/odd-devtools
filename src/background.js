@@ -18,16 +18,20 @@ function panelHandler(message) {
   console.log('from the panel>', message);
 
   if (message.command === 'inject') {
+    browser.tabs.executeScript(message.tabId, { file: 'browser-polyfill.js' });
     browser.tabs.executeScript(message.tabId, { file: message.script });
   } else if (message.command === 'info') {
+    csPort.postMessage(message);
+  }
+  else if (message.command === 'ping page') {
     csPort.postMessage(message);
   }
 }
 
 function csHandler(message) {
-  console.log('from the content script>', message);
+  console.log('from the content script>', message)
+  panelPort.postMessage(message)
 }
-
 
 /**
  * Set up port communications from the content script to the panel page and back again

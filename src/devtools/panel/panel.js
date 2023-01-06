@@ -1,3 +1,5 @@
+const sessionID = crypto.randomUUID();
+
 /**
 When the user clicks the 'message' button,
 send a message to the background script.
@@ -29,23 +31,24 @@ document.getElementById('refresh').addEventListener('click', () => {
   requestInfo();
 });
 
+document.getElementById('ping').addEventListener('click', () => {
+  panelPort.postMessage({
+    tabId: browser.devtools.inspectedWindow.tabId,
+    command: 'ping page'
+  })
+});
+
 function handleMessage(request, sender, sendResponse) {
-
-  console.log('in background page handler', request, sender, sendResponse);
- 
-  if (sender.url != browser.runtime.getURL("/devtools/panel/panel.html")) {
-    console.log(`error, sender url is: ${sender.url}`)
-    return;
-  }
-
-  console.log('from background page>', request);
+  console.log('from background page>', request, sender, sendResponse)
 }
 
-let panelPort = browser.runtime.connect({name: 'devtools-panel'});
+let panelPort = browser.runtime.connect({name: 'devtools-panel'})
+
+panelPort.onMessage.addListener(handleMessage)
 
 setTimeout(() => {
   // tick
-  injectScript('/devtools/panel/content_script.js');
+  injectScript('/devtools/panel/content_script.js')
 }, 0);
 
 

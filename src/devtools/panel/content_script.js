@@ -1,16 +1,31 @@
-// console.log('this is content_script.js!');
+console.log('this is content_script.js!')
 
 myPort = browser.runtime.connect({name:"port-from-cs"})
 
-let wn = window.wrappedJSObject.navigator.__wn;
+// let wn = window.wrappedJSObject.navigator.__wn;
 
 myPort.onMessage.addListener((message) => {
   console.log('message from background>', message);
 
-  wn.authenticatedUsername().then((name) => {
-    myPort.postMessage({type: 'info', info: { name: name }})
-  })
+  // if (message)
+
+  if (message.command === 'ping page') {
+    window.postMessage(message, target)
+  }
 })
+
+let target = document.location.href;
+let message = {msg: 'message from content script'};
+
+addEventListener('message', (event) => {
+
+  if (event.data.command === 'current_user') {
+    console.log('message in cs', event)
+    myPort.postMessage(event.data)
+  }
+})
+
+// window.postMessage(message, target);
 
 // myPort.postMessage({type: 'info', type: tt})
 
