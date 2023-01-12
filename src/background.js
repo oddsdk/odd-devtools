@@ -1,18 +1,6 @@
-/** 
-
-How comms works in this extension ( currently ):
-
-1. when the dev tools are opened and our panel is viewed, we inject 
-a content script into the 'inspectedWindow'
-  * a message is sent from the panel to the backrgound page, which 
-    then injects the script
-2. the content script fires up, gathers some initial info about the 
-page, 
-
-
-*/
-
 let panelPort, csPort
+
+console.log(`In background.js`)
 
 function panelHandler(message) {
   console.log('from the panel>', message);
@@ -20,7 +8,8 @@ function panelHandler(message) {
   if (message.command === 'inject') {
     browser.tabs.executeScript(message.tabId, { file: 'browser-polyfill.js' });
     browser.tabs.executeScript(message.tabId, { file: message.script });
-  } else if (message.command === 'info') {
+  } 
+  else if (message.command === 'info') {
     csPort.postMessage(message);
   }
   else if (message.command === 'ping page') {
@@ -31,6 +20,17 @@ function panelHandler(message) {
 function csHandler(message) {
   console.log('from the content script>', message)
   panelPort.postMessage(message)
+}
+
+/**
+ * When we receive the message, execute the given script in the given
+ * tab.
+ */
+function injectContentScript(message) {
+
+  console.log('background page>', message);
+
+  browser.tabs.executeScript(message.tabId, { file: message.script });
 }
 
 /**

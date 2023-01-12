@@ -17,11 +17,8 @@ myPort.onMessage.addListener((message) => {
 let target = document.location.href;
 let message = {msg: 'message from content script'};
 
-addEventListener('message', (event) => {
-
-  if (event.data.command === 'current_user') {
-    console.log('message in cs', event)
-    myPort.postMessage(event.data)
-  }
+window.addEventListener('message', (event) => {
+  console.log('in cs, got message', event)
+  myPort.postMessage(event)
 })
 

@@ -6,10 +6,12 @@
 
  - [x] basic devtools extension 
 
-### TODOs:
+### Initialization
 
- - [ ] create initial content script
- - [ ] is webnative loaded?
- - [ ] are we connected?
- - [ ] who is connected?
- - [ ] storage interrogation / get fs object
+1. devtools opens
+2. user clicks on our panel to show it
+   - panelShown handler is triggered
+3. panel sets up communications back through devtools -> background
+4. background attaches content script to the 
+
+ 

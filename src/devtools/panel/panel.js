@@ -1,5 +1,27 @@
 const sessionID = crypto.randomUUID();
 
+console.log(`Panel/Session ID is ${sessionID}`)
+
+let panelPort = browser.runtime.connect({name: 'devtools-panel'});
+
+function init() {
+  console.log(`called init`)
+}
+
+function shown() {
+  console.log(`called shown`)
+}
+
+function injectScript(scriptToInject) {
+
+  // console.log('inspectedWindow', browser.devtools.inspectedWindow);
+  panelPort.postMessage({
+    tabId: browser.devtools.inspectedWindow.tabId,
+    script: scriptToInject,
+    command: 'inject'
+  });
+}
+
 document.getElementById('page-info').addEventListener('click', () => {
   getPageInfo((msg) => {
     // console.log(`getPageInfo::${msg}`);
@@ -7,11 +29,24 @@ document.getElementById('page-info').addEventListener('click', () => {
   })
 });
 
+// call-dummy
+document.getElementById('call-dummy').addEventListener('click', () => {
+  chrome.devtools.inspectedWindow.eval(
+    'navigator.dummy();',
+    function(result, isException) {
+      if (isException) {
+        console.error(`Error: ${result}`)
+      } 
+      else {
+        console.log(`called dummy, result is: ${result}`)
+      }
+    }
+  );
+});
+
 function handleMessage(request, sender, sendResponse) {
   console.log('From background page>', request, sender, sendResponse)
 }
-
-let panelPort = browser.runtime.connect({name: 'devtools-panel'})
 
 panelPort.onMessage.addListener(handleMessage)
 
