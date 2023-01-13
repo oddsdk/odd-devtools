@@ -11,6 +11,8 @@
   "background": {
     "scripts": [
       "browser-polyfill.js",
+      "events.js",
+      "utils.js",
       "background.js"
     ]
   },  
@@ -18,5 +20,5 @@
       "<all_urls>",
       "activeTab"
   ],
-  "devtools_page": "devtools/devtools-page.html"
+  "devtools_page": "devtools-page.html"
 }
