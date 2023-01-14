@@ -22,6 +22,12 @@
     "src/**/*.js",
     "src/**/*.svelte"
   ],
+  "paths": {
+    "$src":["src"],
+    "$src/*": ["src/*"],
+    "$utils":["src/utils"],
+    "$utils/*": ["src/utils/*"],
+  },
   "references": [
     {
       "path": "./tsconfig.node.json"

@@ -5,6 +5,7 @@ import { defineConfig } from "vite";
 import manifest from "./manifest-chrome.json";
 
 const srcDir = resolve(__dirname, "src");
+const utilsDir = resolve(__dirname, "src/utils")
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -21,6 +22,8 @@ export default defineConfig({
     resolve: {
         alias: {
             src: srcDir,
+            utils: utilsDir
         },
     },
+    
 })
