@@ -10,7 +10,12 @@ const srcDir = resolve(__dirname, "src");
 export default defineConfig({
     build: {
         emptyOutDir: true,
-        outDir: resolve(__dirname, 'dist/chrome')
+        outDir: resolve(__dirname, 'dist/chrome'),
+        rollupOptions: {
+            input: {
+              panel: resolve(__dirname, 'src/devtools/panel.html'),
+            },
+          },
     },
     plugins: [ svelte(), crx({ manifest }) ],
     resolve: {

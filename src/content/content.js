@@ -1,6 +1,6 @@
 console.log('this is content_script.js!')
 
-extensionPort = browser.runtime.connect({name:"content-script"})
+const extensionPort = browser.runtime.connect({name:"content-script"})
 
 // let wn = window.wrappedJSObject.navigator.__wn;
 

@@ -9,16 +9,26 @@
     "48": "src/assets/icons/star.png"
   },
   "background": {
-    "service_worker": "src/background.js",
+    "service_worker": "src/background/background.js",
     "scripts": [
       "src/browser-polyfill.js",
       "src/events.js",
       "src/utils.js"
     ]
   },
-  "permissions": [
-      "<all_urls>",
-      "activeTab"
+  "content_scripts": [
+    {
+      "matches": [
+        "https://*/*"
+      ],
+      "js": [
+        "src/content/content.js"
+      ]
+    }
   ],
-  "devtools_page": "src/devtools-page.html"
+  "devtools_page": "src/devtools/devtools.html",
+  "permissions": [
+    "<all_urls>",
+    "activeTab"
+  ]
 }
