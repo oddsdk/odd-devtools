@@ -27,8 +27,10 @@
     }
   ],
   "devtools_page": "src/devtools/devtools.html",
+  "host_permissions": [
+    "*://*/*"
+  ],
   "permissions": [
-    "<all_urls>",
     "activeTab"
   ]
 }
