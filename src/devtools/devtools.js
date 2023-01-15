@@ -2,6 +2,7 @@
 This script is run whenever the devtools are open.
 In here, we can create our panel.
 */
+import '$utils/browser-polyfill.js'
 
 console.log(`In devtools.js`)
 
@@ -27,6 +28,8 @@ browser.devtools.panels.create(
   newPanel.onShown.addListener(handleShown);
   newPanel.onHidden.addListener(handleHidden);
 }); 
+
+export {}
 
 // let panelPort, csPort;
 

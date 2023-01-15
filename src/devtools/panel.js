@@ -1,3 +1,5 @@
+import '$utils/browser-polyfill.js'
+
 let port = browser.runtime.connect({name: 'devtools-panel'});
 
 // let injected = false; // intialize
@@ -140,5 +142,6 @@ document.querySelector('#tracking-control').addEventListener('click', (ev) => {
   }
 })
 
+export {}
 
 

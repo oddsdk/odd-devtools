@@ -1,3 +1,5 @@
+import '$utils/browser-polyfill.js'
+
 let panelPort, csPort
 
 console.log(`In background.js`)
@@ -15,7 +17,7 @@ function panelHandler(data) {
     injector(data.tabId)
   }
   else if (data.type === 'counter') {
-    if(csPort) {
+    if (csPort) {
       // relay the event to the content script
       csPort.postMessage(data)
     }
@@ -52,3 +54,5 @@ function pageMessageHandler(message) {
   // console.log(`pageMessageHandler: got a message in the content script`, message)
   panelPort.postMessage(message)
 }
+
+export { }
