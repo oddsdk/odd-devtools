@@ -11,7 +11,6 @@
   "background": {
     "service_worker": "src/background/background.js",
     "scripts": [
-      "src/browser-polyfill.js",
       "src/events.js",
       "src/utils.js"
     ]
@@ -28,9 +27,14 @@
   ],
   "devtools_page": "src/devtools/devtools.html",
   "host_permissions": [
-    "*://*/*"
+    "https://*/*"
   ],
   "permissions": [
     "activeTab"
-  ]
+  ],
+  "externally_connectable": {
+    "matches": [
+      "https://*/*"
+    ]
+  }
 }

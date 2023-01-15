@@ -2,7 +2,7 @@
 This script is run whenever the devtools are open.
 In here, we can create our panel.
 */
-import '$utils/browser-polyfill.js'
+import browser from "webextension-polyfill"
 
 console.log(`In devtools.js`)
 

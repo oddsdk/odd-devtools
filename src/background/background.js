@@ -1,5 +1,3 @@
-import '$utils/browser-polyfill.js'
-
 let panelPort, csPort
 
 console.log(`In background.js`)
@@ -48,11 +46,11 @@ function connectionListener(port) {
   }
 }
 
-browser.runtime.onConnect.addListener(connectionListener);
+chrome.runtime.onConnect.addListener(connectionListener);
 
 function pageMessageHandler(message) {
   // console.log(`pageMessageHandler: got a message in the content script`, message)
   panelPort.postMessage(message)
 }
 
-export { }
+// export { }

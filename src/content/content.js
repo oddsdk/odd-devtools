@@ -1,4 +1,6 @@
-console.log('this is content_script.js!')
+import browser from "webextension-polyfill"
+
+console.log('this is content.js!')
 
 const extensionPort = browser.runtime.connect({name:"content-script"})
 

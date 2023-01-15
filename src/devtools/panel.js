@@ -1,4 +1,4 @@
-import '$utils/browser-polyfill.js'
+import browser from "webextension-polyfill"
 
 let port = browser.runtime.connect({name: 'devtools-panel'});
 
