@@ -6,11 +6,9 @@ import browser from "webextension-polyfill"
 
 console.log(`In devtools.js`)
 
-function handleShown(panelWin) {
-  console.log("panel is being shown", panelWin)
-
-  panelWin.init()
-
+function handleShown(window) {
+  console.log("panel is being shown", window)
+  window.init()
 }
 
 function handleHidden() {
@@ -21,15 +19,17 @@ function handleHidden() {
 Create a panel, and add listeners for panel show/hide events.
 */
 browser.devtools.panels.create(
-  "Example panel",
-  "/icons/star.png",
-  "panel.html"
+  "Webnative",
+  "/src/assets/icons/star.png",
+  "/src/devtools/panel.html"
 ).then((newPanel) => {
+  console.log('panel created', newPanel)
+
   newPanel.onShown.addListener(handleShown);
   newPanel.onHidden.addListener(handleHidden);
-}); 
+})
 
-export {}
+export { }
 
 // let panelPort, csPort;
 

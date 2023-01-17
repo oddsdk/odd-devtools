@@ -10,7 +10,7 @@ console.log(`panel.js tabId: ${browser.devtools.inspectedWindow.tabId}`)
 /**
  * Inject the content script.
  */
-function init() {
+window.init = function init() {
   console.log(`Called init`)
   port.postMessage({
     type: 'inject', 
