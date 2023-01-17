@@ -4,8 +4,10 @@ console.log(`In background.js`)
 
 function injector(tabId) {
   console.log(`Attempting to inject content script.`)
-  browser.tabs.executeScript(tabId, {
-    file: 'content_script.js'
+
+  chrome.scripting.executeScript({
+      target: { tabId },
+      files: ['/src/content/content.js'],
   })
 }
 
@@ -52,5 +54,3 @@ function pageMessageHandler(message) {
   // console.log(`pageMessageHandler: got a message in the content script`, message)
   panelPort.postMessage(message)
 }
-
-// export { }

@@ -1,8 +1,6 @@
-import browser from "webextension-polyfill"
-
 console.log('this is content.js!')
 
-const extensionPort = browser.runtime.connect({name:"content-script"})
+const extensionPort = chrome.runtime.connect({name:"content-script"})
 
 // let wn = window.wrappedJSObject.navigator.__wn;
 

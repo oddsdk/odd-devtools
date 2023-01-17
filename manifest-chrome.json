@@ -15,26 +15,28 @@
       "src/utils.js"
     ]
   },
-  "content_scripts": [
-    {
-      "matches": [
-        "https://*/*"
-      ],
-      "js": [
-        "src/content/content.js"
-      ]
-    }
-  ],
   "devtools_page": "src/devtools/devtools.html",
   "host_permissions": [
     "https://*/*"
   ],
   "permissions": [
-    "activeTab"
+    "activeTab",
+    "scripting"
   ],
   "externally_connectable": {
     "matches": [
       "https://*/*"
     ]
-  }
+  },
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "src/devtools/devtools.html",
+        "src/devtools/panel.html",
+        "src/content/content.js"
+      ],
+      "matches": ["https://*/*"],
+      "extension_ids": []
+    }
+  ]
 }
