@@ -1,11 +1,36 @@
 import browser from "webextension-polyfill"
 
-let port = browser.runtime.connect({name: 'devtools-panel'});
 
-// let injected = false; // intialize
+// INIT
+
+let port = browser.runtime.connect({ name: 'devtools-panel' })
+port.onMessage.addListener(handleBackgroundMessage)
+port.onDisconnect.addListener(showConnectButton)
 
 console.log(`panel.js tabId: ${browser.devtools.inspectedWindow.tabId}`)
 
+// BACKGROUND
+
+function handleBackgroundMessage(event) {
+  // console.log('panel port onMessage', event)
+  if (event.type === 'counter') {
+    if (event.event === 'start') {
+      document.querySelector('#status').textContent = 'Started'
+    }
+    else if (event.event === 'update') {
+      document.querySelector('#count').textContent = event.count
+    }
+    else if (event.event === 'stop') {
+      document.querySelector('#status').textContent = 'Stopped'
+    }
+    else if (event.event === 'reset') {
+      document.querySelector('#count').textContent = event.count
+    }
+  } else if (event.type === 'mouse-tracking') {
+    document.querySelector('#mouse-x').textContent = event.x;
+    document.querySelector('#mouse-y').textContent = event.y;
+  }
+}
 
 /**
  * Inject the content script.
@@ -13,11 +38,32 @@ console.log(`panel.js tabId: ${browser.devtools.inspectedWindow.tabId}`)
 window.init = function init() {
   console.log(`Called init`)
   port.postMessage({
-    type: 'inject', 
+    type: 'inject',
     script: 'content_script.js',
     tabId: browser.devtools.inspectedWindow.tabId
   });
 }
+
+
+// CONNECT
+
+document.querySelector('#connect').addEventListener('click', () => {
+  console.log('connect clicked')
+
+  port = browser.runtime.connect({ name: 'devtools-panel' })
+  port.onMessage.addListener(handleBackgroundMessage)
+  port.onDisconnect.addListener(showConnectButton)
+
+  document.querySelector('#connect').style.display = 'none'
+})
+
+function showConnectButton() {
+  console.log('received port disconnect')
+  document.querySelector('#connect').style.display = 'block'
+}
+
+
+// COUNTER
 
 document.querySelector('#start-btn').addEventListener('click', (ev) => {
   console.log(`Logged start`)
@@ -43,26 +89,6 @@ document.querySelector('#reset-btn').addEventListener('click', (ev) => {
   })
 })
 
-port.onMessage.addListener((event) => {
-  // console.log('panel port onMessage', event)
-  if (event.type === 'counter') {
-    if (event.event === 'start') {
-      document.querySelector('#status').textContent = 'Started'
-    }
-    else if (event.event === 'update') {
-      document.querySelector('#count').textContent = event.count
-    }
-    else if (event.event === 'stop') {
-      document.querySelector('#status').textContent = 'Stopped'
-    }
-    else if (event.event === 'reset') {
-      document.querySelector('#count').textContent = event.count
-    }
-  } else if (event.type === 'mouse-tracking') {
-    document.querySelector('#mouse-x').textContent = event.x;
-    document.querySelector('#mouse-y').textContent = event.y;
-  }
-})
 
 
 /**
@@ -138,10 +164,10 @@ document.querySelector('#tracking-control').addEventListener('click', (ev) => {
     tracking = stopMouseTracking()
     document.querySelector('#tracking-control').textContent = 'Start tracking';
     document.querySelector('#mouse-x').textContent = 0;
-    document.querySelector('#mouse-y').textContent = 0;    
+    document.querySelector('#mouse-y').textContent = 0;
   }
 })
 
-export {}
+export { }
 
 

@@ -50,7 +50,15 @@ function connectionListener(port) {
 
 chrome.runtime.onConnect.addListener(connectionListener);
 
-function pageMessageHandler(message) {
-  // console.log(`pageMessageHandler: got a message in the content script`, message)
+/**
+ * Listen for messages from the content script
+ */
+chrome.runtime.onMessage.addListener(message => {
+  // console.log('message in background script', message)
   panelPort.postMessage(message)
-}
+})
+
+// function pageMessageHandler(message) {
+//   // console.log(`pageMessageHandler: got a message in the content script`, message)
+//   panelPort.postMessage(message)
+// }

@@ -58,5 +58,6 @@ extensionPort.onMessage.addListener((ev) => {
 
 window.addEventListener('message', (event) => {
   // console.log('in cs, got message', event)
-  extensionPort.postMessage(event.data)
+
+  chrome.runtime.sendMessage(event.data)
 })
