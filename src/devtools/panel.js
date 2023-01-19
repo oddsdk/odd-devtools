@@ -13,20 +13,7 @@ console.log(`panel.js tabId: ${browser.devtools.inspectedWindow.tabId}`)
 
 function handleBackgroundMessage(event) {
   // console.log('panel port onMessage', event)
-  if (event.type === 'counter') {
-    if (event.event === 'start') {
-      document.querySelector('#status').textContent = 'Started'
-    }
-    else if (event.event === 'update') {
-      document.querySelector('#count').textContent = event.count
-    }
-    else if (event.event === 'stop') {
-      document.querySelector('#status').textContent = 'Stopped'
-    }
-    else if (event.event === 'reset') {
-      document.querySelector('#count').textContent = event.count
-    }
-  } else if (event.type === 'mouse-tracking') {
+  if (event.type === 'mouse-tracking') {
     document.querySelector('#mouse-x').textContent = event.x;
     document.querySelector('#mouse-y').textContent = event.y;
   }
@@ -37,6 +24,7 @@ function handleBackgroundMessage(event) {
  */
 window.init = function init() {
   console.log(`Called init`)
+
   port.postMessage({
     type: 'inject',
     script: 'content_script.js',
@@ -61,34 +49,6 @@ function showConnectButton() {
   console.log('received port disconnect')
   document.querySelector('#connect').style.display = 'block'
 }
-
-
-// COUNTER
-
-document.querySelector('#start-btn').addEventListener('click', (ev) => {
-  console.log(`Logged start`)
-  port.postMessage({
-    type: 'counter',
-    event: 'start'
-  })
-})
-
-document.querySelector('#stop-btn').addEventListener('click', (ev) => {
-  console.log(`Logged stop`)
-  port.postMessage({
-    type: 'counter',
-    event: 'stop'
-  })
-})
-
-document.querySelector('#reset-btn').addEventListener('click', (ev) => {
-  console.log(`Logged reset`)
-  port.postMessage({
-    type: 'counter',
-    event: 'reset'
-  })
-})
-
 
 
 /**
