@@ -9,6 +9,7 @@ import manifest from "./manifest-chrome.json";
 export default defineConfig({
     build: {
         emptyOutDir: true,
+        minify: false,
         outDir: resolve('./dist/chrome'),
         rollupOptions: {
             input: {

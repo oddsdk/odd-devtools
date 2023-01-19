@@ -9,11 +9,7 @@
     "48": "star.png"
   },
   "background": {
-    "service_worker": "src/background/background.js",
-    "scripts": [
-      "src/events.js",
-      "src/utils.js"
-    ]
+    "scripts": [ "src/background/background.js" ]
   },
   "devtools_page": "src/devtools/devtools.html",
   "host_permissions": [
@@ -23,11 +19,6 @@
     "activeTab",
     "scripting"
   ],
-  "externally_connectable": {
-    "matches": [
-      "https://*/*"
-    ]
-  },
   "web_accessible_resources": [
     {
       "resources": [
@@ -35,8 +26,7 @@
         "src/devtools/panel.html",
         "src/content/content.js"
       ],
-      "matches": ["https://*/*"],
-      "extension_ids": []
+      "matches": ["https://*/*"]
     }
   ]
 }
