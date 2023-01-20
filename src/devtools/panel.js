@@ -3,11 +3,24 @@ import browser from "webextension-polyfill"
 
 // INIT
 
-let port = browser.runtime.connect({ name: 'devtools-panel' })
-port.onMessage.addListener(handleBackgroundMessage)
-port.onDisconnect.addListener(showConnectButton)
+let backgroundPort = browser.runtime.connect({ name: 'devtools-panel' })
+backgroundPort.onMessage.addListener(handleBackgroundMessage)
 
 console.log(`panel.js tabId: ${browser.devtools.inspectedWindow.tabId}`)
+
+/**
+ * Rewire connection with the background script. 
+ */
+function connectionListener(port) {
+  console.log('connection in panel from ', port.name)
+
+  if (port.name === 'background') {
+    backgroundPort = port
+    backgroundPort.onMessage.addListener(handleBackgroundMessage)
+  }
+}
+
+chrome.runtime.onConnect.addListener(connectionListener)
 
 // BACKGROUND
 
@@ -25,31 +38,11 @@ function handleBackgroundMessage(event) {
 window.init = function init() {
   console.log(`Called init`)
 
-  port.postMessage({
+  backgroundPort.postMessage({
     type: 'inject',
-    script: 'content_script.js',
     tabId: browser.devtools.inspectedWindow.tabId
   });
 }
-
-
-// CONNECT
-
-document.querySelector('#connect').addEventListener('click', () => {
-  console.log('connect clicked')
-
-  port = browser.runtime.connect({ name: 'devtools-panel' })
-  port.onMessage.addListener(handleBackgroundMessage)
-  port.onDisconnect.addListener(showConnectButton)
-
-  document.querySelector('#connect').style.display = 'none'
-})
-
-function showConnectButton() {
-  console.log('received port disconnect')
-  document.querySelector('#connect').style.display = 'block'
-}
-
 
 /**
  * Mouse position tracking - we inject a script that listens for mouse x/y 
@@ -129,5 +122,3 @@ document.querySelector('#tracking-control').addEventListener('click', (ev) => {
 })
 
 export { }
-
-
