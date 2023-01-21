@@ -22,8 +22,6 @@
   "web_accessible_resources": [
     {
       "resources": [
-        "src/devtools/devtools.html",
-        "src/devtools/panel.html",
         "src/content/content.js"
       ],
       "matches": ["https://*/*"]
