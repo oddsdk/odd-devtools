@@ -1,4 +1,7 @@
+import { writable } from "svelte/store";
 import browser from "webextension-polyfill"
+
+import Panel from "/src/devtools/Panel.svelte";
 
 
 // INIT
@@ -7,6 +10,21 @@ let backgroundPort = browser.runtime.connect({ name: 'devtools-panel' })
 backgroundPort.onMessage.addListener(handleBackgroundMessage)
 
 console.log(`panel.js tabId: ${browser.devtools.inspectedWindow.tabId}`)
+
+/**
+ * Inject the content script.
+ */
+window.init = function init() {
+  console.log(`Called init`)
+
+  backgroundPort.postMessage({
+    type: 'inject',
+    tabId: browser.devtools.inspectedWindow.tabId
+  });
+}
+
+
+// BACKGROUND
 
 /**
  * Rewire connection with the background script. 
@@ -22,26 +40,28 @@ function connectionListener(port) {
 
 chrome.runtime.onConnect.addListener(connectionListener)
 
-// BACKGROUND
+
+// RENDER PANEL
+
+const target = document.getElementById("app");
+
+function render() {
+  new Panel({ target })
+}
+
+document.addEventListener("DOMContentLoaded", render);
+
+
+// MOUSE TRACKING
+
+// Store state that is accesed by Panel component
+export const mousePosition = writable({ x: 0, y: 0 })
 
 function handleBackgroundMessage(event) {
   // console.log('panel port onMessage', event)
   if (event.type === 'mouse-tracking') {
-    document.querySelector('#mouse-x').textContent = event.x;
-    document.querySelector('#mouse-y').textContent = event.y;
+    mousePosition.set({ x: event.x, y: event.y })
   }
-}
-
-/**
- * Inject the content script.
- */
-window.init = function init() {
-  console.log(`Called init`)
-
-  backgroundPort.postMessage({
-    type: 'inject',
-    tabId: browser.devtools.inspectedWindow.tabId
-  });
 }
 
 /**
@@ -50,7 +70,7 @@ window.init = function init() {
  * so be displayed in the devtools panel.
  */
 
-function startMouseTracking() {
+export function startMouseTracking() {
 
   // utility function.
   let script1 = `(function() {
@@ -92,33 +112,12 @@ function startMouseTracking() {
 
   // script to stop the event from happening.
   browser.devtools.inspectedWindow.eval(script1)
-  return true
 }
 
-let tracking = false;
-
-function stopMouseTracking() {
+export function stopMouseTracking() {
   let script2 = `(function() {
     document.onmousemove = null;
   })();`;
 
   browser.devtools.inspectedWindow.eval(script2)
-  return false;
 }
-
-
-document.querySelector('#tracking-control').addEventListener('click', (ev) => {
-  // console.log(`tracking control`)
-  if (document.querySelector('#tracking-control').textContent === 'Start tracking') {
-    tracking = startMouseTracking()
-    document.querySelector('#tracking-control').textContent = 'Stop tracking';
-  }
-  else {
-    tracking = stopMouseTracking()
-    document.querySelector('#tracking-control').textContent = 'Start tracking';
-    document.querySelector('#mouse-x').textContent = 0;
-    document.querySelector('#mouse-y').textContent = 0;
-  }
-})
-
-export { }
