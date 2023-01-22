@@ -10,6 +10,7 @@ on:
   workflow_dispatch: null
 jobs:
   Version:
+    if: ${{ false }} 
     outputs:
       created: ${{ steps.daily-version.outputs.created }}
       version: ${{ steps.daily-version.outputs.version }}
@@ -31,7 +32,8 @@ jobs:
           exclude: true
   Submit:
     needs: Version
-    if: github.event_name == 'workflow_dispatch' || needs.Version.outputs.created
+    # if: github.event_name == 'workflow_dispatch' || needs.Version.outputs.created
+    if: ${{ false }} 
     strategy:
       fail-fast: false
       matrix:
