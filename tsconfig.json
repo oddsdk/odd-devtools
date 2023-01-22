@@ -20,7 +20,10 @@
     "src/**/*.d.ts",
     "src/**/*.ts",
     "src/**/*.js",
-    "src/**/*.svelte"
+    "src/**/*.svelte",
+    "svelte.config.js",
+    "vite.chrome.config.ts",
+    "vite.firefox.config.ts"
   ],
   "paths": {
     "$utils":["src/utils"],

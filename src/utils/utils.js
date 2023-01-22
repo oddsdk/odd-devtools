@@ -1,12 +1,12 @@
 /**
  */
 
-function logInPage(message, level) {
-  let levels = [ 'log', 'warn', 'error', 'info' ];
+export function logInPage(message, level) {
+  let levels = ['log', 'warn', 'error', 'info']
 
   if (!levels.includes(level)) {
-    console.warn(`Invalid level supplied: ${level}, needs to be one of ${levels.join(',')}`);
-    level = 'log'; // default log level
+    console.warn(`Invalid level supplied: ${level}, needs to be one of ${levels.join(',')}`)
+    level = 'log' // default log level
   }
 
   browser.devtools.inspectedWindow.eval(
@@ -16,5 +16,5 @@ function logInPage(message, level) {
         console.error(`Exception thrown trying to log to the page: ${result}`)
       }
     }
-  );  
+  )
 }

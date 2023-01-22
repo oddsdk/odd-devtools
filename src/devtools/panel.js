@@ -1,7 +1,7 @@
-import { writable } from "svelte/store";
-import browser from "webextension-polyfill"
+import { writable } from 'svelte/store'
+import browser from 'webextension-polyfill'
 
-import Panel from "/src/devtools/Panel.svelte";
+import Panel from '/src/devtools/Panel.svelte'
 
 
 // INIT
@@ -15,12 +15,12 @@ console.log(`panel.js tabId: ${browser.devtools.inspectedWindow.tabId}`)
  * Inject the content script.
  */
 window.init = function init() {
-  console.log(`Called init`)
+  console.log('Called init')
 
   backgroundPort.postMessage({
     type: 'inject',
     tabId: browser.devtools.inspectedWindow.tabId
-  });
+  })
 }
 
 
@@ -43,13 +43,13 @@ chrome.runtime.onConnect.addListener(connectionListener)
 
 // RENDER PANEL
 
-const target = document.getElementById("app");
+const target = document.getElementById('app')
 
 function render() {
   new Panel({ target })
 }
 
-document.addEventListener("DOMContentLoaded", render);
+document.addEventListener('DOMContentLoaded', render)
 
 
 // MOUSE TRACKING
@@ -117,7 +117,7 @@ export function startMouseTracking() {
 export function stopMouseTracking() {
   let script2 = `(function() {
     document.onmousemove = null;
-  })();`;
+  })();`
 
   browser.devtools.inspectedWindow.eval(script2)
 }

@@ -1,21 +1,17 @@
 <script lang="ts">
-  import {
-    mousePosition,
-    startMouseTracking,
-    stopMouseTracking,
-  } from "./panel";
+  import { mousePosition, startMouseTracking, stopMouseTracking } from './panel'
 
-  let tracking = false;
+  let tracking = false
 
   function handleTrackingControl() {
     if (tracking) {
-      tracking = false;
-      stopMouseTracking();
+      tracking = false
+      stopMouseTracking()
 
-      mousePosition.set({ x: 0, y: 0 });
+      mousePosition.set({ x: 0, y: 0 })
     } else {
-      tracking = true;
-      startMouseTracking();
+      tracking = true
+      startMouseTracking()
     }
   }
 </script>
@@ -31,8 +27,12 @@
     {/if}
   </button>
 
-  <p>X: <span>{$mousePosition.x}</span></p>
-  <p>Y: <span>{$mousePosition.y}</span></p>
+  <p>
+    X: <span>{$mousePosition.x}</span>
+  </p>
+  <p>
+    Y: <span>{$mousePosition.y}</span>
+  </p>
 </div>
 
 <style>
@@ -48,7 +48,7 @@
   * {
     background-color: #dedede;
     color: #343434;
-    font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS",
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS',
       sans-serif;
   }
 </style>
