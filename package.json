@@ -7,7 +7,9 @@
     "build": "NODE_ENV=production run-s build:chrome build:firefox",
     "build:chrome": "vite build --config vite.chrome.config.ts",
     "build:firefox": "vite build --config vite.firefox.config.ts",
-    "check": "svelte-check --tsconfig ./tsconfig.json"
+    "check": "svelte-check --tsconfig ./tsconfig.json",
+    "lint": "eslint src/**/*.js",
+    "test": "run-s lint"
   },
   "devDependencies": {
     "@crxjs/vite-plugin": "^2.0.0-beta.10",
