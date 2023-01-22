@@ -20,7 +20,7 @@ Create a panel, and add listeners for panel show/hide events.
 */
 browser.devtools.panels.create(
   'Webnative',
-  '/src/assets/icons/star.png',
+  '/webnative16.png',
   '/src/devtools/panel.html'
 ).then((newPanel) => {
   console.log('panel created', newPanel)
