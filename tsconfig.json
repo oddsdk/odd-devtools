@@ -1,0 +1,40 @@
+{
+  "extends": "@tsconfig/svelte/tsconfig.json",
+  "compilerOptions": {
+    "target": "esnext",
+    // We currently build with vite, but need to specify an outDir
+    // to avoid overwrite warnings for JavaScript files in VSCode.
+    "outDir": "none",
+    "useDefineForClassFields": true,
+    "module": "esnext",
+    "resolveJsonModule": true,
+    "baseUrl": ".",
+    /**
+       * Typecheck JS in `.svelte` and `.js` files by default.
+       * Disable checkJs if you'd like to use dynamic types in JS.
+       * Note that setting allowJs false does not prevent the use
+       * of JS in `.svelte` files.
+       */
+    "allowJs": true,
+    "checkJs": false,
+    "isolatedModules": true
+  },
+  "include": [
+    "src/**/*.d.ts",
+    "src/**/*.ts",
+    "src/**/*.js",
+    "src/**/*.svelte",
+    "svelte.config.js",
+    "vite.chrome.config.ts",
+    "vite.firefox.config.ts"
+  ],
+  "paths": {
+    "$utils":["src/utils"],
+    "$utils/*": ["src/utils/*"]
+  },
+  "references": [
+    {
+      "path": "./tsconfig.node.json"
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+// vite tsconfig
+{
+  "compilerOptions": {
+    "composite": true,
+    "module": "esnext",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true
+  },
+  "include": [
+    "manifest-chrome.json",
+    "manifest-firefox.json",
+    "vite.chrome.config.ts",
+    "vite.firefox.config.ts"
+  ]
+}

@@ -1,5 +1,36 @@
 {
+  "name": "webnative-devtools",
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "NODE_ENV=production run-s build:chrome build:firefox",
+    "build:chrome": "vite build --config vite.chrome.config.ts",
+    "build:firefox": "vite build --config vite.firefox.config.ts",
+    "check": "svelte-check --tsconfig ./tsconfig.json",
+    "lint": "eslint src/**/*.js",
+    "test": "run-s lint"
+  },
   "devDependencies": {
+    "@crxjs/vite-plugin": "^2.0.0-beta.10",
+    "@sveltejs/vite-plugin-svelte": "^2.0.2",
+    "@tsconfig/svelte": "^3.0.0",
+    "@types/chrome": "^0.0.208",
+    "@types/firefox-webext-browser": "^94.0.1",
+    "@types/webextension-polyfill": "^0.10.0",
+    "@typescript-eslint/eslint-plugin": "^5.48.2",
+    "@typescript-eslint/parser": "^5.48.2",
+    "eslint": "^8.32.0",
+    "eslint-plugin-svelte": "^2.14.1",
+    "eslint-plugin-svelte3": "^4.0.0",
+    "npm-run-all": "^4.1.5",
+    "svelte": "^3.55.1",
+    "svelte-check": "^3.0.2",
+    "svelte-preprocess": "^5.0.0",
+    "tslib": "^2.4.1",
+    "typescript": "^4.9.4",
+    "vite": "^4.0.4",
+    "vite-plugin-static-copy": "^0.13.0",
     "webextension-polyfill": "^0.9.0"
   }
 }

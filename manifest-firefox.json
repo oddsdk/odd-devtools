@@ -1,0 +1,31 @@
+{
+  "description": "Adds a new panel to the developer tools. The panel contains buttons that demonstrate various basic features of the devtools API.",
+  "manifest_version": 3,
+  "name": "devtools-panels",
+  "version": "0.0.1",
+  "author": "Jeff Griffiths",
+  "homepage_url": "https://github.com/webnative-examples/webnative-devtools",
+  "icons": {
+    "48": "webnative48.png",
+    "96": "webnative96.png"
+  },
+  "background": {
+    "scripts": [ "src/background/background.js" ]
+  },
+  "devtools_page": "src/devtools/devtools.html",
+  "host_permissions": [
+    "https://*/*"
+  ],
+  "permissions": [
+    "activeTab",
+    "scripting"
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "src/content/content.js"
+      ],
+      "matches": ["https://*/*"]
+    }
+  ]
+}
