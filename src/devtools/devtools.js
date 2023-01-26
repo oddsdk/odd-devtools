@@ -8,10 +8,16 @@ console.log('In devtools.js')
 
 function handleShown(window) {
   console.log('panel is being shown', window)
+
+  // Connect with Webnative on panel shown
+
   window.init()
 }
 
 function handleHidden() {
+  // Disconnect from Webnative when panel hidden (?)
+
+
   console.log('panel is being hidden')
 }
 

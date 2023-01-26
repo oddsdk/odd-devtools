@@ -108,6 +108,12 @@ export function startMouseTracking() {
       window.postMessage(data)
     }
     document.onmousemove = handleMouseMove
+
+    if (window.navigator.connectToWebnative) {
+      window.navigator.connectToWebnative()
+    } else {
+      console.log("connect to webanative not defined.")
+    }
   })();`
 
   // script to stop the event from happening.
