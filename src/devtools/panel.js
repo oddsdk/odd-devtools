@@ -61,6 +61,8 @@ function handleBackgroundMessage(event) {
   // console.log('panel port onMessage', event)
   if (event.type === 'mouse-tracking') {
     mousePosition.set({ x: event.x, y: event.y })
+  } else if (event.type === 'connected') {
+    console.log('received connected message from Webnative')
   }
 }
 
@@ -110,11 +112,6 @@ export function startMouseTracking() {
     }
     document.onmousemove = handleMouseMove
 
-    // if (window.navigator.connectToWebnative) {
-    //   window.navigator.connectToWebnative()
-    // } else {
-    //   console.log("connect to webanative not defined.")
-    // }
   })();`
 
   // script to stop the event from happening.

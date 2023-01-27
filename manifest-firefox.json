@@ -14,7 +14,8 @@
   },
   "devtools_page": "src/devtools/devtools.html",
   "host_permissions": [
-    "https://*/*"
+    "https://*/*",
+    "http://localhost:8080/*"
   ],
   "permissions": [
     "activeTab",

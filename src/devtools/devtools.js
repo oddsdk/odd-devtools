@@ -12,6 +12,15 @@ function handleShown(window) {
   // Connect with Webnative on panel shown
 
   window.init()
+
+  browser.devtools.inspectedWindow.eval(`(function() {
+    if (window.navigator.connectToWebnative) {
+      window.navigator.connectToWebnative('${chrome.runtime.id}')
+    } else {
+      console.log("connect to webanative not defined.")
+    }
+  })()`
+  )
 }
 
 function handleHidden() {
