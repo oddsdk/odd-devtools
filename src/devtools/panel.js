@@ -100,6 +100,7 @@ export function startMouseTracking() {
       // console.log(event.pageX, event.pageY)
 
       let data = JSON.parse(JSON.stringify({
+        id: '${chrome.runtime.id}',
         type: 'mouse-tracking', 
         x: event.pageX,
         y: event.pageY
@@ -109,11 +110,11 @@ export function startMouseTracking() {
     }
     document.onmousemove = handleMouseMove
 
-    if (window.navigator.connectToWebnative) {
-      window.navigator.connectToWebnative()
-    } else {
-      console.log("connect to webanative not defined.")
-    }
+    // if (window.navigator.connectToWebnative) {
+    //   window.navigator.connectToWebnative()
+    // } else {
+    //   console.log("connect to webanative not defined.")
+    // }
   })();`
 
   // script to stop the event from happening.

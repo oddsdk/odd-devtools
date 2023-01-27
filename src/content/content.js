@@ -6,7 +6,9 @@ window.addEventListener('message', (event) => {
   // Reject messages not from ourselves
   if (event.source !== window) return
 
-  console.log('in cs, got message', event)
+  if (event.data.id === chrome.runtime.id) {
+    // console.log('in cs, got message', event.data)
 
-  chrome.runtime.sendMessage(event.data)
+    chrome.runtime.sendMessage(event.data)
+  }
 })
