@@ -6,12 +6,16 @@ import browser from 'webextension-polyfill'
 
 console.log('In devtools.js')
 
+let panelInitialized = false
+
 function handleShown(window) {
   console.log('panel is being shown', window)
 
-  // Connect with Webnative on panel shown
+  if (!panelInitialized) {
+    window.init()
 
-  window.init()
+    panelInitialized = true
+  }
 
   browser.devtools.inspectedWindow.eval(`(function() {
     if (window.navigator.connectToWebnative) {
