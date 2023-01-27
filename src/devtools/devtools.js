@@ -28,8 +28,13 @@ function handleShown(window) {
 }
 
 function handleHidden() {
-  // Disconnect from Webnative when panel hidden (?)
-
+  browser.devtools.inspectedWindow.eval(`
+    if (window.navigator.disconnectFromWebnative) {
+      window.navigator.disconnectFromWebnative('${chrome.runtime.id}')
+    } else {
+      console.log("disconnect from webanative not defined.")
+    }`
+  )
 
   console.log('panel is being hidden')
 }

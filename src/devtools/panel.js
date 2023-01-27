@@ -63,6 +63,8 @@ function handleBackgroundMessage(event) {
     mousePosition.set({ x: event.x, y: event.y })
   } else if (event.type === 'connected') {
     console.log('received connected message from Webnative')
+  } else if (event.type === 'disconnected') {
+    console.log('received disconnected message from Webnative')
   }
 }
 
