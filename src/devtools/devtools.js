@@ -18,8 +18,8 @@ function handleShown(window) {
   }
 
   browser.devtools.inspectedWindow.eval(`
-    if (window.navigator.connectToWebnative) {
-      window.navigator.connectToWebnative('${chrome.runtime.id}')
+    if (window.__webnative) {
+      window.__webnative.connect('${chrome.runtime.id}')
     } else {
       console.log("connect to webanative not defined.")
     }`
@@ -28,8 +28,8 @@ function handleShown(window) {
 
 function handleHidden() {
   browser.devtools.inspectedWindow.eval(`
-    if (window.navigator.disconnectFromWebnative) {
-      window.navigator.disconnectFromWebnative('${chrome.runtime.id}')
+    if (window.__webnative) {
+      window.__webnative.disconnect('${chrome.runtime.id}')
     } else {
       console.log("disconnect from webanative not defined.")
     }`
