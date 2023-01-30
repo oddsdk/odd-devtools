@@ -56,6 +56,7 @@ document.addEventListener('DOMContentLoaded', render)
 
 // Store state that is accesed by Panel component
 export const mousePosition = writable({ x: 0, y: 0 })
+export const data = writable({})
 
 function handleBackgroundMessage(event) {
   // console.log('panel port onMessage', event)
@@ -65,6 +66,10 @@ function handleBackgroundMessage(event) {
     console.log('received connected message from Webnative')
   } else if (event.type === 'disconnected') {
     console.log('received disconnected message from Webnative')
+  } else if (event.type === 'data') {
+    data.set(event.data)
+  } else {
+    console.log('received an unknown message type')
   }
 }
 

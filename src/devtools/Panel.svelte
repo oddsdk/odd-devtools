@@ -1,5 +1,10 @@
 <script lang="ts">
-  import { mousePosition, startMouseTracking, stopMouseTracking } from './panel'
+  import {
+    data,
+    mousePosition,
+    startMouseTracking,
+    stopMouseTracking
+  } from './panel'
 
   let tracking = false
 
@@ -33,6 +38,10 @@
   <p>
     Y: <span>{$mousePosition.y}</span>
   </p>
+
+  <h2>Data from Webnative</h2>
+
+  <p>{JSON.stringify($data)}</p>
 </div>
 
 <style>
