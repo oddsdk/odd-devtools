@@ -15,7 +15,7 @@
   "devtools_page": "src/devtools/devtools.html",
   "host_permissions": [
     "https://*/*",
-    "http://localhost:8080/*"
+    "<all_urls>"
   ],
   "permissions": [
     "activeTab",
