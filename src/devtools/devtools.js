@@ -17,9 +17,11 @@ function handleShown(window) {
     panelInitialized = true
   }
 
+  console.log('extension id in devtools panel', chrome.runtime.id)
+
   browser.devtools.inspectedWindow.eval(`
-    if (window.__webnative) {
-      window.__webnative.connect('${chrome.runtime.id}')
+    if (window.__webnative.extension) {
+      window.__webnative.extension.connect('${chrome.runtime.id}')
     } else {
       console.log("connect to webanative not defined.")
     }`
@@ -28,8 +30,8 @@ function handleShown(window) {
 
 function handleHidden() {
   browser.devtools.inspectedWindow.eval(`
-    if (window.__webnative) {
-      window.__webnative.disconnect('${chrome.runtime.id}')
+    if (window.__webnative.extension) {
+      window.__webnative.extension.disconnect('${chrome.runtime.id}')
     } else {
       console.log("disconnect from webanative not defined.")
     }`
