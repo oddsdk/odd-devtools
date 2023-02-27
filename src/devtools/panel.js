@@ -62,10 +62,10 @@ function handleBackgroundMessage(event) {
   // console.log('panel port onMessage', event)
   if (event.type === 'mouse-tracking') {
     mousePosition.set({ x: event.x, y: event.y })
-  } else if (event.type === 'connected') {
-    console.log('received connected message from Webnative')
-  } else if (event.type === 'disconnected') {
-    console.log('received disconnected message from Webnative')
+  } else if (event.type === 'connect') {
+    console.log('received connect message from Webnative')
+  } else if (event.type === 'disconnect') {
+    console.log('received disconnect message from Webnative')
   } else if (event.type === 'data') {
     data.set(event.data)
   } else {
