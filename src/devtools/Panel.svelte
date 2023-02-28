@@ -2,6 +2,7 @@
   import {
     data,
     detail,
+    eventHistory,
     eventType,
     mousePosition,
     startMouseTracking,
@@ -42,6 +43,8 @@
   </p> -->
 
   <h2>Data from Webnative</h2>
+
+  <h4>Event History: {JSON.stringify($eventHistory)}</h4>
 
   <h4>Event: {$eventType}</h4>
 

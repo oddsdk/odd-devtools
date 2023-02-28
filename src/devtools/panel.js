@@ -59,24 +59,39 @@ export const mousePosition = writable({ x: 0, y: 0 })
 export const data = writable({})
 export const eventType = writable({})
 export const detail = writable(null)
+export const eventHistory = writable([])
 
 function handleBackgroundMessage(event) {
   // console.log('panel port onMessage', event)
-
   if (event.type === 'mouse-tracking') {
     mousePosition.set({ x: event.x, y: event.y })
   } else if (event.type === 'connect') {
     console.log('received connect message from Webnative', event)
     data.set(event.state)
     eventType.set(event.type)
+    eventHistory.update(history => [...history, event.type])
   } else if (event.type === 'disconnect') {
     console.log('received disconnect message from Webnative', event)
-    data.set(event.state)
+
     eventType.set(event.type)
+    eventHistory.update(history => [...history, event.type])
+
+    data.set(event.state)
+  } else if (event.type === 'session') {
+    console.log('received session event', event)
+
+    eventType.set(`${event.type} ${event.detail.type}`)
+    eventHistory.update(history => [...history, `${event.type} ${event.detail.type}`])
+
+    data.set(event.state)
+    detail.set(event.detail)
   } else if (event.type === 'filesystem') {
     console.log('received filesystem event', event)
-    data.set(event.state)
+
     eventType.set(`${event.type} ${event.detail.type}`)
+    eventHistory.update(history => [...history, `${event.type} ${event.detail.type}`])
+
+    data.set(event.state)
     detail.set(event.detail)
   } else {
     console.log('received an unknown message type', event)
