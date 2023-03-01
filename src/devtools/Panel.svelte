@@ -1,46 +1,32 @@
 <script lang="ts">
   import {
-    data,
+    connect,
+    disconnect,
     detail,
     eventHistory,
     eventType,
-    mousePosition,
-    startMouseTracking,
-    stopMouseTracking
-  } from './panel'
+    state
+  } from './devtools'
 
-  let tracking = false
+  let connected = false
 
-  function handleTrackingControl() {
-    if (tracking) {
-      tracking = false
-      stopMouseTracking()
+  function handleConnect() {
+    connect()
+    connected = true
+  }
 
-      mousePosition.set({ x: 0, y: 0 })
-    } else {
-      tracking = true
-      startMouseTracking()
-    }
+  function handleDisconnect() {
+    disconnect()
+    connected = false
   }
 </script>
 
 <div class="wrapper">
-  <!-- <h2 class="tracking-header">Track mouse coordinates in the page.</h2>
-
-  <button on:click={handleTrackingControl}>
-    {#if tracking}
-      Stop Tracking
-    {:else}
-      Start Tracking
-    {/if}
-  </button>
-
-  <p>
-    X: <span>{$mousePosition.x}</span>
-  </p>
-  <p>
-    Y: <span>{$mousePosition.y}</span>
-  </p> -->
+  {#if connected}
+    <button on:click={handleDisconnect}>Stop</button>
+  {:else}
+    <button on:click={handleConnect}>Start</button>
+  {/if}
 
   <h2>Data from Webnative</h2>
 
@@ -58,7 +44,7 @@
   <div>
     <h4 style="margin: 2px">State</h4>
     <pre style="margin: 4px">
-{JSON.stringify($data, null, 2)}
+{JSON.stringify($state, null, 2)}
     </pre>
   </div>
 </div>
@@ -68,11 +54,6 @@
     height: 100vh;
     padding: 8px;
   }
-
-  /* .tracking-header {
-    margin-top: 0px;
-  } */
-
   * {
     background-color: #dedede;
     color: #343434;

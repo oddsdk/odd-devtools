@@ -6,7 +6,7 @@ window.addEventListener('message', (event) => {
   if (event.source !== window) return
 
   if (event.data.id === chrome.runtime.id) {
-    // console.log('in cs, got message', event.data)
+    // console.log('in content script, got message', event.data)
 
     chrome.runtime.sendMessage(event.data)
   }
