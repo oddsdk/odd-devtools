@@ -1,9 +1,13 @@
 console.log('this is content.js!')
 
-// let wn = window.wrappedJSObject.navigator.__wn;
 
 window.addEventListener('message', (event) => {
-  // console.log('in cs, got message', event)
+  // Reject messages not from ourselves
+  if (event.source !== window) return
 
-  chrome.runtime.sendMessage(event.data)
+  if (event.data.id === chrome.runtime.id) {
+    // console.log('in cs, got message', event.data)
+
+    chrome.runtime.sendMessage(event.data)
+  }
 })

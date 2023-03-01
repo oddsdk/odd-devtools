@@ -1,5 +1,13 @@
 <script lang="ts">
-  import { mousePosition, startMouseTracking, stopMouseTracking } from './panel'
+  import {
+    data,
+    detail,
+    eventHistory,
+    eventType,
+    mousePosition,
+    startMouseTracking,
+    stopMouseTracking
+  } from './panel'
 
   let tracking = false
 
@@ -17,7 +25,7 @@
 </script>
 
 <div class="wrapper">
-  <h2 class="tracking-header">Track mouse coordinates in the page.</h2>
+  <!-- <h2 class="tracking-header">Track mouse coordinates in the page.</h2>
 
   <button on:click={handleTrackingControl}>
     {#if tracking}
@@ -32,7 +40,27 @@
   </p>
   <p>
     Y: <span>{$mousePosition.y}</span>
-  </p>
+  </p> -->
+
+  <h2>Data from Webnative</h2>
+
+  <h4>Event History: {JSON.stringify($eventHistory)}</h4>
+
+  <h4>Event: {$eventType}</h4>
+
+  {#if $detail}
+    <h4 style="margin: 2px">Detail</h4>
+    <pre style="margin: 4px">
+{JSON.stringify($detail, null, 2)}
+    </pre>
+  {/if}
+
+  <div>
+    <h4 style="margin: 2px">State</h4>
+    <pre style="margin: 4px">
+{JSON.stringify($data, null, 2)}
+    </pre>
+  </div>
 </div>
 
 <style>
@@ -41,9 +69,9 @@
     padding: 8px;
   }
 
-  .tracking-header {
+  /* .tracking-header {
     margin-top: 0px;
-  }
+  } */
 
   * {
     background-color: #dedede;
