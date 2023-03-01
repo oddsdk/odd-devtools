@@ -144,7 +144,6 @@ export function startMouseTracking() {
       window.postMessage(data)
     }
     document.onmousemove = handleMouseMove
-
   })();`
 
   // script to stop the event from happening.

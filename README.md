@@ -37,8 +37,3 @@ The Firefox extension can be loaded at `about:debugging`. Select "This Firefox",
 Firefox requires an extra permission step. Open `about:addons` and find the extension. Select it and in the permissions tab toggle "Access your data for all websites" on.
 
 Then test the plugin as you would in Chrome.
-
-
-
-
- 
