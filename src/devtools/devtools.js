@@ -85,6 +85,7 @@ export function disconnect() {
 
 // MESSAGES
 
+export const connection = writable({ tabId: browser.devtools.inspectedWindow.tabId, connected: false })
 export const state = writable({})
 export const eventType = writable({})
 export const detail = writable(null)
@@ -95,32 +96,34 @@ function handleBackgroundMessage(event) {
 
   if (event.type === 'connect') {
     console.log('received connect message from Webnative', event)
-    state.set(event.state)
+
     eventType.set(event.type)
     eventHistory.update(history => [...history, event.type])
+    state.set(event.state)
+
+    connection.update(store => ({...store, connected: true}))
   } else if (event.type === 'disconnect') {
     console.log('received disconnect message from Webnative', event)
 
     eventType.set(event.type)
     eventHistory.update(history => [...history, event.type])
-
     state.set(event.state)
+
+    connection.update(store => ({...store, connected: false}))
   } else if (event.type === 'session') {
     console.log('received session event', event)
 
     eventType.set(`${event.type} ${event.detail.type}`)
     eventHistory.update(history => [...history, `${event.type} ${event.detail.type}`])
-
-    state.set(event.state)
     detail.set(event.detail)
+    state.set(event.state)
   } else if (event.type === 'filesystem') {
     console.log('received filesystem event', event)
 
     eventType.set(`${event.type} ${event.detail.type}`)
     eventHistory.update(history => [...history, `${event.type} ${event.detail.type}`])
-
-    state.set(event.state)
     detail.set(event.detail)
+    state.set(event.state)
   } else {
     console.log('received an unknown message type', event)
   }

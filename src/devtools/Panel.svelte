@@ -1,6 +1,7 @@
 <script lang="ts">
   import {
     connect,
+    connection,
     disconnect,
     detail,
     eventHistory,
@@ -22,10 +23,11 @@
 </script>
 
 <div class="wrapper">
-  {#if connected}
-    <button on:click={handleDisconnect}>Stop</button>
-  {:else}
-    <button on:click={handleConnect}>Start</button>
+  <div>
+    {#if $connection.connected}
+      <button on:click={handleDisconnect}>Stop</button>
+    {:else}
+      <button on:click={handleConnect}>Start</button>
   {/if}
 
   <h2>Data from Webnative</h2>
