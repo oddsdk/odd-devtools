@@ -1,4 +1,4 @@
-let panelPort
+let devtoolsPort
 
 console.log('In background.js')
 
@@ -11,8 +11,8 @@ function injector(tabId) {
   })
 }
 
-function panelHandler(data) {
-  console.log('panelHandler', data)
+function devtoolsHandler(data) {
+  console.log('devtools handler called with', data)
 
   if (data.type === 'inject') {
     injector(data.tabId)
@@ -20,15 +20,15 @@ function panelHandler(data) {
 }
 
 /**
- * Set up port communications from the content script to the panel page and back again
+ * Set up port communication from the content script to the devtools page and back again
  */
 function connectionListener(port) {
   console.log(`connection from ${port.name}`)
 
-  if (port.name === 'devtools-panel') {
-    // handle  requests from the panel
-    panelPort = port
-    panelPort.onMessage.addListener(panelHandler)
+  if (port.name === 'devtools-page') {
+    // handle  requests from the devtools page
+    devtoolsPort = port
+    devtoolsPort.onMessage.addListener(devtoolsHandler)
   }
 }
 
@@ -42,9 +42,9 @@ chrome.runtime.onMessage.addListener(message => {
   // console.log('message in background script', message)
 
   // Rewire the connection with the devtools panel
-  if (!panelPort) {
-    panelPort = chrome.runtime.connect({ name: 'background' })
+  if (!devtoolsPort) {
+    devtoolsPort = chrome.runtime.connect({ name: 'background' })
   }
 
-  panelPort.postMessage(message)
+  devtoolsPort.postMessage(message)
 })

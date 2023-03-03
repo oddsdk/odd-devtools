@@ -1,46 +1,58 @@
 <script lang="ts">
   import {
-    data,
+    connect,
+    connection,
+    disconnect,
     detail,
     eventHistory,
     eventType,
-    mousePosition,
-    startMouseTracking,
-    stopMouseTracking
-  } from './panel'
+    state
+  } from './devtools'
 
-  let tracking = false
+  let connectionError = false
 
-  function handleTrackingControl() {
-    if (tracking) {
-      tracking = false
-      stopMouseTracking()
+  async function handleConnect() {
+    connectionError = false
 
-      mousePosition.set({ x: 0, y: 0 })
-    } else {
-      tracking = true
-      startMouseTracking()
-    }
+    const { connecting } = await connect()
+
+    if (!connecting) connectionError = true
+  }
+
+  async function handleDisconnect() {
+    connectionError = false
+
+    const disconnecting = await disconnect()
+
+    if (!disconnecting) connectionError = true
   }
 </script>
 
 <div class="wrapper">
-  <!-- <h2 class="tracking-header">Track mouse coordinates in the page.</h2>
-
-  <button on:click={handleTrackingControl}>
-    {#if tracking}
-      Stop Tracking
+  <div>
+    {#if $connection.connected}
+      <button on:click={handleDisconnect}>Stop</button>
     {:else}
-      Start Tracking
+      <button on:click={handleConnect}>Start</button>
     {/if}
-  </button>
+  </div>
 
-  <p>
-    X: <span>{$mousePosition.x}</span>
-  </p>
-  <p>
-    Y: <span>{$mousePosition.y}</span>
-  </p> -->
+  {#if connectionError}
+    <div
+      style="display: inline-block; color: #b31b1b; font-size: 14px; margin-top: 10px"
+    >
+      Please make sure Webnative debug mode is set to true. See the
+      <a
+        href="https://guide.fission.codes/developers/webnative/initialization#configuration"
+        target="_blank"
+        rel="noreferrer"
+        style="color: #b31b1b"
+      >
+        Webnative configuration guide
+      </a>
+      for instructions on enabling debug mode.
+    </div>
+  {/if}
 
   <h2>Data from Webnative</h2>
 
@@ -58,7 +70,7 @@
   <div>
     <h4 style="margin: 2px">State</h4>
     <pre style="margin: 4px">
-{JSON.stringify($data, null, 2)}
+{JSON.stringify($state, null, 2)}
     </pre>
   </div>
 </div>
@@ -68,11 +80,6 @@
     height: 100vh;
     padding: 8px;
   }
-
-  /* .tracking-header {
-    margin-top: 0px;
-  } */
-
   * {
     background-color: #dedede;
     color: #343434;
