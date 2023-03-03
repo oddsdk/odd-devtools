@@ -9,16 +9,22 @@
     state
   } from './devtools'
 
-  let connected = false
+  let connectionError = false
 
-  function handleConnect() {
-    connect()
-    connected = true
+  async function handleConnect() {
+    connectionError = false
+
+    const { connecting } = await connect()
+
+    if (!connecting) connectionError = true
   }
 
-  function handleDisconnect() {
-    disconnect()
-    connected = false
+  async function handleDisconnect() {
+    connectionError = false
+
+    const disconnecting = await disconnect()
+
+    if (!disconnecting) connectionError = true
   }
 </script>
 
@@ -28,6 +34,24 @@
       <button on:click={handleDisconnect}>Stop</button>
     {:else}
       <button on:click={handleConnect}>Start</button>
+    {/if}
+  </div>
+
+  {#if connectionError}
+    <div
+      style="display: inline-block; color: #b31b1b; font-size: 14px; margin-top: 10px"
+    >
+      Please make sure Webnative debug mode is set to true. See the
+      <a
+        href="https://guide.fission.codes/developers/webnative/initialization#configuration"
+        target="_blank"
+        rel="noreferrer"
+        style="color: #b31b1b"
+      >
+        Webnative configuration guide
+      </a>
+      for instructions on enabling debug mode.
+    </div>
   {/if}
 
   <h2>Data from Webnative</h2>

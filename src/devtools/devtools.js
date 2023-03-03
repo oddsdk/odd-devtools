@@ -59,28 +59,38 @@ chrome.runtime.onConnect.addListener(handleBackgroundConnection)
 
 // WEBNATIVE CONNECTION
 
-export function connect() {
+export async function connect() {
   console.log('connecting to Webnative')
 
-  browser.devtools.inspectedWindow.eval(`
-    if (window.__webnative.extension) {
+  const [connecting, err] = await browser.devtools.inspectedWindow.eval(`
+    if (window.__webnative?.extension) {
       window.__webnative.extension.connect('${chrome.runtime.id}')
+      true
     } else {
-      console.log("connect to webanative not defined.")
+      false
     }`
   )
+
+  if (err) console.error(err)
+
+  return { connecting }
 }
 
-export function disconnect() {
+export async function disconnect() {
   console.log('disconnecting from Webnative')
 
-  browser.devtools.inspectedWindow.eval(`
-    if (window.__webnative.extension) {
+  const [disconnecting, err] = await browser.devtools.inspectedWindow.eval(`
+    if (window.__webnative?.extension) {
       window.__webnative.extension.disconnect('${chrome.runtime.id}')
+      true
     } else {
-      console.log("disconnect from webanative not defined.")
+      false
     }`
   )
+
+  if (err) console.error(err)
+
+  return { disconnecting }
 }
 
 // MESSAGES
