@@ -48,3 +48,33 @@ chrome.runtime.onMessage.addListener(message => {
 
   devtoolsPort.postMessage(message)
 })
+
+/**
+ * Detect tab closes and update conneections in storage
+ * 
+ * Note that we should move the remove connection to a function
+ * in the connection.ts module when we can convert this script
+ * to a module.
+ */
+chrome.tabs.onRemoved.addListener(async function(tabId) {
+  console.log('tab closed', tabId)
+
+  // Remove the connection by tabId
+  const store = await chrome.storage.local.get('connections')
+  console.log('store in remove tab listener', store)
+  console.log('connections before removing', store.conenctions)
+
+  // Remove connection
+  store.connections[ `${tabId}` ] = undefined
+
+  // Store conenctions
+  chrome.storage.local.set({ connections: store.connections })
+    .catch(err => console.error('Browser storage error:', err))
+
+  // const test = { id: tabId }
+  // chrome.storage.local.set({ test })
+  // console.log('Storing tabId test to storage', test)
+
+  // const storedTest = await chrome.storage.local.get('test')
+  // console.log('Stored test loaded from storage', storedTest)
+})
