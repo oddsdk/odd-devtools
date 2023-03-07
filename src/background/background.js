@@ -14,7 +14,12 @@ function injector(tabId) {
 function devtoolsHandler(data) {
   console.log('devtools handler called with', data)
 
-  if (data.type === 'inject') {
+  // TODO Consider whether we need this message
+  // Would be used for tracking devtools open/close state, but not sure how we do close
+  if (data.type === 'devtools-open') {
+    console.log('background received devtools open message with tabId:', data.tabId)
+
+  } else if (data.type === 'inject') {
     injector(data.tabId)
   }
 }
@@ -24,12 +29,14 @@ function devtoolsHandler(data) {
  */
 function connectionListener(port) {
   console.log(`connection from ${port.name}`)
+  console.log('with port', port)
 
   if (port.name === 'devtools-page') {
     // handle  requests from the devtools page
     devtoolsPort = port
     devtoolsPort.onMessage.addListener(devtoolsHandler)
   }
+
 }
 
 chrome.runtime.onConnect.addListener(connectionListener)
@@ -39,7 +46,7 @@ chrome.runtime.onConnect.addListener(connectionListener)
  * Wakes up the background service worker if it has been deactivated.
  */
 chrome.runtime.onMessage.addListener(message => {
-  // console.log('message in background script', message)
+  console.log('message in background script', message)
 
   // Rewire the connection with the devtools panel
   if (!devtoolsPort) {
@@ -49,6 +56,8 @@ chrome.runtime.onMessage.addListener(message => {
   devtoolsPort.postMessage(message)
 })
 
+
+
 /**
  * Detect tab closes and update conneections in storage
  * 
@@ -56,7 +65,7 @@ chrome.runtime.onMessage.addListener(message => {
  * in the connection.ts module when we can convert this script
  * to a module.
  */
-chrome.tabs.onRemoved.addListener(async function(tabId) {
+chrome.tabs.onRemoved.addListener(async function (tabId) {
   console.log('tab closed', tabId)
 
   // Remove the connection by tabId
@@ -65,7 +74,9 @@ chrome.tabs.onRemoved.addListener(async function(tabId) {
   console.log('connections before removing', store.conenctions)
 
   // Remove connection
-  store.connections[ `${tabId}` ] = undefined
+  if (store.connections) {
+    store.connections[`${tabId}`] = undefined
+  }
 
   // Store conenctions
   chrome.storage.local.set({ connections: store.connections })

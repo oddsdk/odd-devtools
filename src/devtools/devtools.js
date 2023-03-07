@@ -10,6 +10,7 @@ console.log(`In devtools.js - tabId: ${browser.devtools.inspectedWindow.tabId}`)
 
 // Connect with the background script
 let backgroundPort = browser.runtime.connect({ name: 'devtools-page' })
+backgroundPort.postMessage({ type: 'devtools-open', tabId: browser.devtools.inspectedWindow.tabId.toString() })
 backgroundPort.onMessage.addListener(handleBackgroundMessage)
 
 // Create a panel, and add listeners for panel show/hide events.
@@ -64,52 +65,104 @@ chrome.runtime.onConnect.addListener(handleBackgroundConnection)
 const tabId = browser.devtools.inspectedWindow.tabId.toString()
 export const connection = writable({ tabId, connected: false })
 
-// Load connection from local storage and set connection store
-// when the devtools are opened.
+// Load connection from local storage and reconnect if needed
 connectionStorage.get(tabId).then(async storedConnection => {
   console.log('stored connection', storedConnection)
 
   if (storedConnection) {
     connection.update(state => ({ ...state, connected: storedConnection.connected }))
-    
+
     if (storedConnection.connected) await connect()
   }
 })
 
-// browser.storage.local.get([`${tabId}`]).then(result => {
-//   let storedConnection = result[`${tabId}`]
+// browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+//   // console.log('tab updated', tabId, '--', changeInfo, '--', tab)
 
-//   console.log('result from storage', result)
-//   console.log('Connection state loaded from extension storage', storedConnection)
+//   if (changeInfo.status == 'complete' && tab.active) {
 
-//   if (storedConnection?.connected) {
-//     connection.update(state => ({...state, connected: storedConnection.connected}) )
+//     console.log('tab updated', tabId)
+//     console.log('with change info', changeInfo)
+//     console.log('with tab', tab)
+
 //   }
 // })
 
 
-// TODO Can we set the connection to false when the tab is first opened? No, the devtools aren't active yet
+// browser.webNavigation.onCompleted.addListener(async ({ tabId }) => {
+// browser.webNavigation.onCompleted.addListener(async event  => {
+//   const { frameId, tabId, timeStamp } = event
+//   console.log('On complete navigation event', event)
 
-// TODO Delete the state in storage when a tab is closed. This may need to happen in the background?
-// What if the devtools aren't open when the tab is closed
-// Won't work, can't count on devtools being open
-// chrome.tabs.onRemoved.addListener(function(tabId, removed) {
-//   console.log('tab closed', tabId)
+//   // await reconnect(tabId, timeStamp)
+
+//   if (frameId === 0 && tabId === browser.devtools.inspectedWindow.tabId) {
+//     console.log('navigation in the current tab', tabId)
+
+//     const storedConnection = await connectionStorage.get(tabId)
+
+//     if (storedConnection) {
+//       // Re-inject the content script
+//       backgroundPort.postMessage({
+//         type: 'inject',
+//         tabId: browser.devtools.inspectedWindow.tabId
+//       })
+
+//       console.log('stored connection in onComplete', storedConnection)
+//       connection.update(state => ({ ...state, connected: storedConnection.connected }))
+
+//       if (storedConnection.connected) await connect()
+
+//       // if (storedConnection.connected) {
+//       //   const interval = setInterval(async () => {
+//       //     const { connecting }= await connect()
+
+//       //     console.log('connecting on reload', connecting)
+
+//       //     if (connecting) clearInterval(interval)
+//       //   }, 1000)
+
+//       // }
+//     }
+//   }
 // })
 
-// Or instead, keep the state but remove tab connection information if tabs are not 
-// open each time we initialize the devtools panel is opened
-//
-// Use https://developer.chrome.com/docs/extensions/reference/tabs/#method-query and
-// query with url, pendingUrl, title, and favIconUrl properties set to false to avoid
-// triggering tabs permission (is this possible? Without the permission, these should be
-// omitted from the query results)
-//
-// Possible alternative is chrome.tabs.get, for each stored tabId
 
-// TODO Load state when the page reloads, update connection store and re-establish connection with Webnative
-// Note the tab should have remained open for connection tracking, on first load connected should be false
-// The first page load may be redundant since we'll already call this above
+// function createReconnect() {
+//   let lastTimeStamp 
+
+//   return async (tabId, timeStamp) => {
+//     console.log('timeStamp', timeStamp)
+//     console.log('lastTimeStamp', lastTimeStamp)
+
+//     // Filter out repeated events
+//     if (timeStamp === lastTimeStamp) return
+//     lastTimeStamp = timeStamp
+
+//     console.log('lastTimeStamp set to', lastTimeStamp)
+
+//     if (tabId === browser.devtools.inspectedWindow.tabId) {
+//       console.log('navigation in the current tab', tabId)
+
+//       const storedConnection = await connectionStorage.get(tabId)
+
+//       if (storedConnection) {
+//         // Re-inject the content script
+//         backgroundPort.postMessage({
+//           type: 'inject',
+//           tabId: browser.devtools.inspectedWindow.tabId
+//         })
+
+//         console.log('stored connection in onComplete', storedConnection)
+//         connection.update(state => ({ ...state, connected: storedConnection.connected }))
+
+//         if (storedConnection.connected) await connect()
+//       }
+//     }
+//   }
+// }
+
+// const reconnect = createReconnect()
 
 export async function connect() {
   console.log('connecting to Webnative')
@@ -145,6 +198,24 @@ export async function disconnect() {
   return { disconnecting }
 }
 
+async function reconnect(storedConnection) {
+  // Re-inject the content script
+  backgroundPort.postMessage({
+    type: 'inject',
+    tabId: browser.devtools.inspectedWindow.tabId
+  })
+
+  console.log('stored connection in reconnect', storedConnection)
+  connection.update(state => ({ ...state, connected: storedConnection.connected }))
+
+  // if (storedConnection.connected) await connect()
+  if (storedConnection.connected) setTimeout(async () => { 
+    const { connecting } = await connect() 
+    
+    console.log('connecting status after calling connect', connecting)
+  }, 50)
+}
+
 // MESSAGES
 
 export const state = writable({})
@@ -163,7 +234,7 @@ function handleBackgroundMessage(event) {
     state.set(event.state)
 
     connection.update(store => ({ ...store, connected: true }))
-    connectionStorage.update({ tabId, connected: true })
+    connectionStorage.set({ tabId, connected: true })
   } else if (event.type === 'disconnect') {
     console.log('received disconnect message from Webnative', event)
 
@@ -172,7 +243,7 @@ function handleBackgroundMessage(event) {
     state.set(event.state)
 
     connection.update(store => ({ ...store, connected: false }))
-    connectionStorage.update({ tabId, connected: false })
+    connectionStorage.set({ tabId, connected: false })
   } else if (event.type === 'session') {
     console.log('received session event', event)
 
@@ -187,6 +258,18 @@ function handleBackgroundMessage(event) {
     eventHistory.update(history => [...history, `${event.type} ${event.detail.type}`])
     detail.set(event.detail)
     state.set(event.state)
+  } else if (event.type === 'pageload') {
+    console.log('received page load event', event)
+
+    connectionStorage.get(tabId).then(storedConnection => {
+      if (storedConnection) {
+        // reconnect(storedConnection)
+        // .catch(err => console.error('Unable to reconnect to Webnative:', err))
+
+        setTimeout(() => reconnect(storedConnection)
+          .catch(err => console.error('Unable to reconnect to Webnative:', err)), 1000)
+      }
+    })
   } else {
     console.log('received an unknown message type', event)
   }

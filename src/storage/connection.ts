@@ -14,60 +14,58 @@ export async function get(tabId: number): Promise<Connection | null> {
   const store: Connections = await browser.storage.local.get('connections')
   let storedConnection
 
-  console.log('store in get', store)
+  console.log('connections store in get', store)
 
   if (store && store.connections) {
     storedConnection = store.connections[ `${tabId}` ]
 
-    console.log('loading connections in get', store.connections)
     console.log('connection in get', storedConnection)
   }
 
   return storedConnection ? { tabId, connected: storedConnection.connected } : null
 }
 
-export async function update(connection: Connection) {
+export async function set(connection: Connection) {
   const { tabId, connected } = connection
 
-  console.log('Updating storage with connection', connection)
+  // console.log('Updating storage with connection', connection)
 
   // Load existing connections from storage
   const store = await browser.storage.local.get('connections')
-  console.log('stored connections in update', store)
+  // console.log('stored connections in update', store)
 
   // If connections are undefined, start with an empty object
   if (!store.connections) store[ 'connections' ] = {}
 
   // Add or update the connection to the connections object
   store.connections[ `${tabId}` ] = { connected }
-  console.log('storing connections as', store)
+  // console.log('storing connections as', store)
 
   // Store it
   browser.storage.local.set({ connections: store.connections })
     .catch(err => console.error('Browser storage error:', err))
 
-  // const obj = {}
-  // obj[ 'connections' ] = undefined
-  // await browser.storage.local.set(obj)
-  const updatedConnections = await browser.storage.local.get('connections')
+  // const updatedConnections = await browser.storage.local.get('connections')
 
-  console.log('Updated connections', updatedConnections)
+  // console.log('Updated connections', updatedConnections)
 }
 
-export async function remove(tabId: number): Promise<void> {
-  const store: Connections = await browser.storage.local.get('connections')
-  console.log('store in get', store)
+// export async function remove(tabId: number): Promise<void> {
+//   const store: Connections = await browser.storage.local.get('connections')
+//   // console.log('store in remove', store)
 
-  console.log('connections before removing', store.conenctions)
+//   // console.log('connections before removing', store.conenctions)
 
-  // Remove connection
-  store.connections[ `${tabId}` ] = undefined
+//   // Remove connection
+//   if (store.connections[ `${tabId}` ]) {
+//     store.connections[ `${tabId}` ] = undefined
+//   }
 
-  // Store conenctions
-  browser.storage.local.set({ connections: store.connections })
-    .catch(err => console.error('Browser storage error:', err))
+//   // Store conenctions
+//   browser.storage.local.set({ connections: store.connections })
+//     .catch(err => console.error('Browser storage error:', err))
 
-}
+// }
 
 export async function sweep() {
   // Load connections
