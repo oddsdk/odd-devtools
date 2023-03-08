@@ -135,10 +135,7 @@ async function reconnect(storedConnection) {
 
 // MESSAGES
 
-export const state = writable({})
-export const eventType = writable({})
-export const detail = writable(null)
-export const eventHistory = writable([])
+export const eventStore = writable([])
 
 function handleBackgroundMessage(event) {
   console.log('panel port onMessage', event)
@@ -146,35 +143,25 @@ function handleBackgroundMessage(event) {
   if (event.type === 'connect') {
     console.log('received connect message from Webnative', event)
 
-    eventType.set(event.type)
-    eventHistory.update(history => [...history, event.type])
-    state.set(event.state)
+    eventStore.update(history => [...history, event])
 
     connection.update(store => ({ ...store, connected: true }))
     connectionStorage.set({ tabId, connected: true })
   } else if (event.type === 'disconnect') {
     console.log('received disconnect message from Webnative', event)
 
-    eventType.set(event.type)
-    eventHistory.update(history => [...history, event.type])
-    state.set(event.state)
+    eventStore.update(history => [...history, event])
 
     connection.update(store => ({ ...store, connected: false }))
     connectionStorage.set({ tabId, connected: false })
   } else if (event.type === 'session') {
     console.log('received session event', event)
 
-    eventType.set(`${event.type} ${event.detail.type}`)
-    eventHistory.update(history => [...history, `${event.type} ${event.detail.type}`])
-    detail.set(event.detail)
-    state.set(event.state)
+    eventStore.update(history => [...history, event])
   } else if (event.type === 'filesystem') {
     console.log('received filesystem event', event)
 
-    eventType.set(`${event.type} ${event.detail.type}`)
-    eventHistory.update(history => [...history, `${event.type} ${event.detail.type}`])
-    detail.set(event.detail)
-    state.set(event.state)
+    eventStore.update(history => [...history, event])
   } else if (event.type === 'pageload') {
     console.log('received page load event', event)
 
