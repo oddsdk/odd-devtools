@@ -27,18 +27,18 @@ browser.devtools.panels.create(
 
 // PANEL
 
-let panelInitialized = false
+let contentScriptInjected = false
 
 function handleShown(window) {
-  console.log('panel is being shown', window)
+  console.log('** Content script injected in panel handleShown', contentScriptInjected)
 
-  if (!panelInitialized) {
+  if (!contentScriptInjected) {
     backgroundPort.postMessage({
       type: 'inject',
       tabId: browser.devtools.inspectedWindow.tabId
     })
 
-    panelInitialized = true
+    contentScriptInjected = true
   }
 }
 
@@ -76,94 +76,6 @@ connectionStorage.get(tabId).then(async storedConnection => {
   }
 })
 
-// browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-//   // console.log('tab updated', tabId, '--', changeInfo, '--', tab)
-
-//   if (changeInfo.status == 'complete' && tab.active) {
-
-//     console.log('tab updated', tabId)
-//     console.log('with change info', changeInfo)
-//     console.log('with tab', tab)
-
-//   }
-// })
-
-
-// browser.webNavigation.onCompleted.addListener(async ({ tabId }) => {
-// browser.webNavigation.onCompleted.addListener(async event  => {
-//   const { frameId, tabId, timeStamp } = event
-//   console.log('On complete navigation event', event)
-
-//   // await reconnect(tabId, timeStamp)
-
-//   if (frameId === 0 && tabId === browser.devtools.inspectedWindow.tabId) {
-//     console.log('navigation in the current tab', tabId)
-
-//     const storedConnection = await connectionStorage.get(tabId)
-
-//     if (storedConnection) {
-//       // Re-inject the content script
-//       backgroundPort.postMessage({
-//         type: 'inject',
-//         tabId: browser.devtools.inspectedWindow.tabId
-//       })
-
-//       console.log('stored connection in onComplete', storedConnection)
-//       connection.update(state => ({ ...state, connected: storedConnection.connected }))
-
-//       if (storedConnection.connected) await connect()
-
-//       // if (storedConnection.connected) {
-//       //   const interval = setInterval(async () => {
-//       //     const { connecting }= await connect()
-
-//       //     console.log('connecting on reload', connecting)
-
-//       //     if (connecting) clearInterval(interval)
-//       //   }, 1000)
-
-//       // }
-//     }
-//   }
-// })
-
-
-// function createReconnect() {
-//   let lastTimeStamp 
-
-//   return async (tabId, timeStamp) => {
-//     console.log('timeStamp', timeStamp)
-//     console.log('lastTimeStamp', lastTimeStamp)
-
-//     // Filter out repeated events
-//     if (timeStamp === lastTimeStamp) return
-//     lastTimeStamp = timeStamp
-
-//     console.log('lastTimeStamp set to', lastTimeStamp)
-
-//     if (tabId === browser.devtools.inspectedWindow.tabId) {
-//       console.log('navigation in the current tab', tabId)
-
-//       const storedConnection = await connectionStorage.get(tabId)
-
-//       if (storedConnection) {
-//         // Re-inject the content script
-//         backgroundPort.postMessage({
-//           type: 'inject',
-//           tabId: browser.devtools.inspectedWindow.tabId
-//         })
-
-//         console.log('stored connection in onComplete', storedConnection)
-//         connection.update(state => ({ ...state, connected: storedConnection.connected }))
-
-//         if (storedConnection.connected) await connect()
-//       }
-//     }
-//   }
-// }
-
-// const reconnect = createReconnect()
-
 export async function connect() {
   console.log('connecting to Webnative')
 
@@ -199,21 +111,26 @@ export async function disconnect() {
 }
 
 async function reconnect(storedConnection) {
+  console.log('** Content script injected in panel handleShown', contentScriptInjected)
+
   // Re-inject the content script
-  backgroundPort.postMessage({
-    type: 'inject',
-    tabId: browser.devtools.inspectedWindow.tabId
-  })
+  if (!contentScriptInjected) {
+    backgroundPort.postMessage({
+      type: 'inject',
+      tabId: browser.devtools.inspectedWindow.tabId
+    })
+
+    contentScriptInjected = true
+  }
 
   console.log('stored connection in reconnect', storedConnection)
   connection.update(state => ({ ...state, connected: storedConnection.connected }))
 
-  // if (storedConnection.connected) await connect()
-  if (storedConnection.connected) setTimeout(async () => { 
-    const { connecting } = await connect() 
-    
-    console.log('connecting status after calling connect', connecting)
-  }, 50)
+  if (storedConnection.connected) {
+    const { connecting } = await connect()
+
+    console.log('connecting status after attempting to reconnect', connecting)
+  }
 }
 
 // MESSAGES
@@ -262,12 +179,8 @@ function handleBackgroundMessage(event) {
     console.log('received page load event', event)
 
     connectionStorage.get(tabId).then(storedConnection => {
-      if (storedConnection) {
-        // reconnect(storedConnection)
-        // .catch(err => console.error('Unable to reconnect to Webnative:', err))
-
-        setTimeout(() => reconnect(storedConnection)
-          .catch(err => console.error('Unable to reconnect to Webnative:', err)), 1000)
+      if (storedConnection?.connected) { 
+        reconnect(storedConnection).catch(err => console.log('Unable to reconnect with Webnative', err))
       }
     })
   } else {
