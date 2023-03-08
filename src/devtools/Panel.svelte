@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onDestroy } from 'svelte'
+  import { JsonView } from '@zerodevx/svelte-json-view'
   import { connect, connection, disconnect, eventStore } from './devtools'
 
   let connectionError = false
@@ -44,9 +45,13 @@
 <div class="panel-wrapper">
   <div>
     {#if $connection.connected}
-      <button on:click={handleDisconnect}>Stop</button>
+      <button style="background-color: #bf616a" on:click={handleDisconnect}>
+        Stop
+      </button>
     {:else}
-      <button on:click={handleConnect}>Start</button>
+      <button style="background-color: #a3be8c" on:click={handleConnect}>
+        Start
+      </button>
     {/if}
   </div>
 
@@ -67,14 +72,16 @@
 
   <div class="wrapper">
     <div>
-      <h3 class="section-label">Event History</h3>
+      {#if events.length > 0}
+        <h3 class="section-label">Event History</h3>
+      {/if}
       <div class="event-history">
         {#each events as event, index}
           {#if event.type === 'connect' || event.type === 'disconnect'}
             <button
               style:background-color={index === selectedEventIndex
-                ? '#ede55a'
-                : '#fefefe'}
+                ? '#81a1c1'
+                : '#fdfdfe'}
               on:click={() => handleEventClick(index)}
             >
               {event.type}
@@ -82,8 +89,8 @@
           {:else}
             <button
               style:background-color={index === selectedEventIndex
-                ? '#ede55a'
-                : '#fefefe'}
+                ? '#81a1c1'
+                : '#fdfdfe'}
               on:click={() => handleEventClick(index)}
             >
               {`${event.type} ${event.detail.type}`}
@@ -93,20 +100,22 @@
       </div>
     </div>
 
-    <div>
-      <h3 class="section-label">Event</h3>
+    <div class="event-section">
+      {#if events.length > 0}
+        <h3 class="section-label">Event</h3>
+      {/if}
       {#if selectedEvent}
         <div class="event-wrapper">
           {#if selectedEvent.detail}
             <h4 class="section-label">Detail</h4>
-            <pre style="margin: 4px">
-{JSON.stringify(selectedEvent.detail, null, 2)}
-    </pre>
+            <div class="jsonview-wrapper">
+              <JsonView json={selectedEvent.detail} />
+            </div>
           {/if}
           <h4 class="section-label">State</h4>
-          <pre style="margin: 4px">
-{JSON.stringify(selectedEvent.state, null, 2)}
-    </pre>
+          <div class="jsonview-wrapper">
+            <JsonView json={selectedEvent.state} />
+          </div>
         </div>
       {/if}
     </div>
@@ -118,13 +127,13 @@
     display: grid;
     grid-template-rows: auto 1fr;
     gap: 8px;
-    width: 100vw;
-    height: 100vh;
+    width: calc(100vw - 16px);
+    height: calc(100vh - 32px);
     padding: 8px;
     overflow-y: auto;
 
     background-color: #1e1e1e;
-    color: #f2f2f2;
+    color: #fdfdfe;
     font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS',
       sans-serif;
   }
@@ -136,10 +145,18 @@
     gap: 10px;
   }
 
+  .event-section {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
   .event-wrapper {
-    background-color: #fefefe;
+    height: 100%;
+    padding: 4px;
+    background-color: #fdfdfe;
     color: #333333;
-    border: 1px solid #fcfcfc;
+    border: 1px solid transparent;
     border-radius: 3px;
     overflow: auto;
   }
@@ -160,6 +177,15 @@
     color: #fefefe;
     font-size: 14px;
     margin-top: 10px;
+  }
+
+  .jsonview-wrapper {
+    font-family: monospace;
+    font-size: 10px;
+    --jsonBorderLeft: 1px solid #81a1c1;
+    --jsonValStringColor: #5e81ac;
+    --jsonValColor: #bf616a;
+    --jsonBracketHoverBackground: #e5e9f0;
   }
 
   button {

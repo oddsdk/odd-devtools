@@ -32,5 +32,8 @@
     "vite": "^4.0.4",
     "vite-plugin-static-copy": "^0.13.0",
     "webextension-polyfill": "^0.9.0"
+  },
+  "dependencies": {
+    "@zerodevx/svelte-json-view": "^1.0.3"
   }
 }
