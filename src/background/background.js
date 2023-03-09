@@ -3,7 +3,7 @@ let devtoolsPort
 console.log('In background.js')
 
 function injector(tabId) {
-  console.log('Attempting to inject content script.')
+  // console.log('Attempting to inject content script.')
 
   chrome.scripting.executeScript({
     target: { tabId },
@@ -12,7 +12,7 @@ function injector(tabId) {
 }
 
 function devtoolsHandler(data) {
-  console.log('devtools handler called with', data)
+  // console.log('devtools handler called with', data)
 
   if (data.type === 'inject') {
     injector(data.tabId)
@@ -23,13 +23,14 @@ function devtoolsHandler(data) {
  * Set up port communication from the content script to the devtools page and back again
  */
 function connectionListener(port) {
-  console.log(`connection from ${port.name}`)
+  // console.log(`connection from ${port.name}`)
 
   if (port.name === 'devtools-page') {
     // handle  requests from the devtools page
     devtoolsPort = port
     devtoolsPort.onMessage.addListener(devtoolsHandler)
   }
+
 }
 
 chrome.runtime.onConnect.addListener(connectionListener)

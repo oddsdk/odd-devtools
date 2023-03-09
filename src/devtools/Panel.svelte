@@ -1,89 +1,187 @@
 <script lang="ts">
-  import {
-    connect,
-    connection,
-    disconnect,
-    detail,
-    eventHistory,
-    eventType,
-    state
-  } from './devtools'
+  import { onDestroy } from 'svelte'
+  import { JsonView } from '@zerodevx/svelte-json-view'
+  import { connection, eventStore } from './devtools'
 
-  let connectionError = false
+  let selectedEvent = null
+  let selectedEventIndex
+  let events = []
 
-  async function handleConnect() {
-    connectionError = false
+  const unsubscribeEvents = eventStore.subscribe(store => {
+    events = store
 
-    const { connecting } = await connect()
+    if (events.length === 1) {
+      selectedEvent = events[0]
+      selectedEventIndex = 0
+    }
+  })
 
-    if (!connecting) connectionError = true
+  function handleEventClick(index) {
+    selectedEvent = events[index]
+    selectedEventIndex = index
+    console.log('selected event', selectedEvent)
   }
 
-  async function handleDisconnect() {
-    connectionError = false
-
-    const disconnecting = await disconnect()
-
-    if (!disconnecting) connectionError = true
-  }
+  onDestroy(unsubscribeEvents)
 </script>
 
-<div class="wrapper">
-  <div>
-    {#if $connection.connected}
-      <button on:click={handleDisconnect}>Stop</button>
-    {:else}
-      <button on:click={handleConnect}>Start</button>
-    {/if}
-  </div>
-
-  {#if connectionError}
-    <div
-      style="display: inline-block; color: #b31b1b; font-size: 14px; margin-top: 10px"
-    >
+<div class="panel-wrapper">
+  {#if $connection.error === 'DebugModeOff'}
+    <div class="connection-error">
       Please make sure Webnative debug mode is set to true. See the
       <a
         href="https://guide.fission.codes/developers/webnative/initialization#configuration"
         target="_blank"
         rel="noreferrer"
-        style="color: #b31b1b"
+        style="color: #fefefe"
       >
         Webnative configuration guide
       </a>
       for instructions on enabling debug mode.
     </div>
+  {:else}
+    <div class="connection-status">
+      {#if $connection.connected}
+        <div>Connected to Webnative</div>
+        {#if events.length === 0}
+          <div class="no-messages">No messages received yet</div>
+        {/if}
+      {/if}
+    </div>
+
+    <div class="wrapper">
+      <div>
+        {#if events.length > 0}
+          <h3 class="section-label">Event History</h3>
+        {/if}
+        <div class="event-history">
+          {#each events as event, index}
+            {#if event.type === 'connect' || event.type === 'disconnect'}
+              <button
+                style:background-color={index === selectedEventIndex
+                  ? '#81a1c1'
+                  : '#fdfdfe'}
+                on:click={() => handleEventClick(index)}
+              >
+                {event.type}
+              </button>
+            {:else}
+              <button
+                style:background-color={index === selectedEventIndex
+                  ? '#81a1c1'
+                  : '#fdfdfe'}
+                on:click={() => handleEventClick(index)}
+              >
+                {`${event.type} ${event.detail.type}`}
+              </button>
+            {/if}
+          {/each}
+        </div>
+      </div>
+
+      <div class="event-section">
+        {#if events.length > 0}
+          <h3 class="section-label">Event</h3>
+        {/if}
+        {#if selectedEvent}
+          <div class="event-wrapper">
+            {#if selectedEvent.detail}
+              <h4 class="section-label">Detail</h4>
+              <div class="jsonview-wrapper">
+                <JsonView json={selectedEvent.detail} />
+              </div>
+            {/if}
+            <h4 class="section-label">State</h4>
+            <div class="jsonview-wrapper">
+              <JsonView json={selectedEvent.state} />
+            </div>
+          </div>
+        {/if}
+      </div>
+    </div>
   {/if}
-
-  <h2>Data from Webnative</h2>
-
-  <h4>Event History: {JSON.stringify($eventHistory)}</h4>
-
-  <h4>Event: {$eventType}</h4>
-
-  {#if $detail}
-    <h4 style="margin: 2px">Detail</h4>
-    <pre style="margin: 4px">
-{JSON.stringify($detail, null, 2)}
-    </pre>
-  {/if}
-
-  <div>
-    <h4 style="margin: 2px">State</h4>
-    <pre style="margin: 4px">
-{JSON.stringify($state, null, 2)}
-    </pre>
-  </div>
 </div>
 
 <style>
-  .wrapper {
-    height: 100vh;
+  .panel-wrapper {
+    display: grid;
+    grid-template-rows: auto 1fr;
+    gap: 8px;
+    width: calc(100vw - 16px);
+    height: calc(100vh - 32px);
     padding: 8px;
-  }
-  * {
-    background-color: #dedede;
-    color: #343434;
+    overflow-y: auto;
+
+    background-color: #1e1e1e;
+    color: #fdfdfe;
     font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS',
       sans-serif;
+  }
+
+  .wrapper {
+    display: grid;
+    grid-template-columns: minmax(min-content, 15vw) 80vw;
+    grid-auto-flow: column;
+    gap: 10px;
+  }
+
+  .event-section {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .event-wrapper {
+    height: 100%;
+    padding: 4px;
+    background-color: #fdfdfe;
+    color: #333333;
+    border: 1px solid transparent;
+    border-radius: 3px;
+    overflow: auto;
+  }
+
+  .event-history {
+    display: grid;
+    grid-template-columns: masonry;
+    gap: 2px;
+  }
+
+  .section-label {
+    margin: 2px 0 4px 2px;
+    white-space: nowrap;
+  }
+
+  .connection-status {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    color: #dddde4;
+  }
+
+  .no-messages {
+    display: grid;
+    justify-content: end;
+  }
+
+  .connection-error {
+    display: inline-block;
+    color: #fefefe;
+    font-size: 14px;
+    margin-top: 10px;
+  }
+
+  .jsonview-wrapper {
+    font-family: monospace;
+    font-size: 10px;
+    --jsonBorderLeft: 1px solid #81a1c1;
+    --jsonValStringColor: #5e81ac;
+    --jsonValColor: #bf616a;
+    --jsonBracketHoverBackground: #e5e9f0;
+  }
+
+  button {
+    background-color: #fefefe;
+    border: 1px solid transparent;
+    border-radius: 3px;
   }
 </style>

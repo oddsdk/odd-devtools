@@ -16,6 +16,15 @@
       "src/utils.js"
     ]
   },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://*/*",
+        "http://localhost:8080/*"
+      ],
+      "js": ["src/content/page-load.js"]
+    }
+  ],
   "devtools_page": "src/devtools/devtools.html",
   "host_permissions": [
     "https://*/*",
@@ -23,7 +32,8 @@
   ],
   "permissions": [
     "activeTab",
-    "scripting"
+    "scripting",
+    "storage"
   ],
   "externally_connectable": {
     "matches": [
@@ -33,7 +43,8 @@
   "web_accessible_resources": [
     {
       "resources": [
-        "src/content/content.js"
+        "src/content/content.js",
+        "src/content/page-load.js"
       ],
       "matches": ["https://*/*"],
       "extension_ids": []
