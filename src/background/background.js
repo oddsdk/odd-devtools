@@ -14,12 +14,7 @@ function injector(tabId) {
 function devtoolsHandler(data) {
   console.log('devtools handler called with', data)
 
-  // TODO Consider whether we need this message
-  // Would be used for tracking devtools open/close state, but not sure how we do close
-  if (data.type === 'devtools-open') {
-    console.log('background received devtools open message with tabId:', data.tabId)
-
-  } else if (data.type === 'inject') {
+  if (data.type === 'inject') {
     injector(data.tabId)
   }
 }

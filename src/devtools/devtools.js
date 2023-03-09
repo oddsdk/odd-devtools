@@ -10,7 +10,6 @@ console.log(`In devtools.js - tabId: ${browser.devtools.inspectedWindow.tabId}`)
 
 // Connect with the background script
 let backgroundPort = browser.runtime.connect({ name: 'devtools-page' })
-backgroundPort.postMessage({ type: 'devtools-open', tabId: browser.devtools.inspectedWindow.tabId.toString() })
 backgroundPort.onMessage.addListener(handleBackgroundMessage)
 
 // Create a panel, and add listeners for panel show/hide events.
