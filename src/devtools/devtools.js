@@ -1,10 +1,9 @@
 import { writable } from 'svelte/store'
 import browser from 'webextension-polyfill'
 
-import * as connectionStorage from '../storage/connection'
-
 console.log(`In devtools.js - tabId: ${browser.devtools.inspectedWindow.tabId}`)
 
+const tabId = browser.devtools.inspectedWindow.tabId
 
 // INIT 
 
@@ -17,29 +16,16 @@ browser.devtools.panels.create(
   'Webnative',
   '/webnative16.png',
   '/src/devtools/panel.html'
-).then(panel => {
-  console.log('panel created', panel)
+)
 
-  panel.onShown.addListener(handleShown)
+// Injet content script
+backgroundPort.postMessage({
+  type: 'inject',
+  tabId
 })
 
-
-// PANEL
-
-let contentScriptInjected = false
-
-function handleShown(window) {
-  console.log('** Content script injected in panel handleShown', contentScriptInjected)
-
-  if (!contentScriptInjected) {
-    backgroundPort.postMessage({
-      type: 'inject',
-      tabId: browser.devtools.inspectedWindow.tabId
-    })
-
-    contentScriptInjected = true
-  }
-}
+// Connect with Webnative
+connect()
 
 
 // BACKGROUND
@@ -48,7 +34,7 @@ function handleShown(window) {
  * Rewire connection with the background script on message
  */
 function handleBackgroundConnection(port) {
-  console.log('connection in devtools page from ', port.name)
+  // console.log('connection in devtools page from ', port.name)
 
   if (port.name === 'background') {
     backgroundPort = port
@@ -61,19 +47,7 @@ chrome.runtime.onConnect.addListener(handleBackgroundConnection)
 
 // WEBNATIVE CONNECTION
 
-const tabId = browser.devtools.inspectedWindow.tabId.toString()
-export const connection = writable({ tabId, connected: false })
-
-// Load connection from local storage and reconnect if needed
-connectionStorage.get(tabId).then(async storedConnection => {
-  console.log('stored connection', storedConnection)
-
-  if (storedConnection) {
-    connection.update(state => ({ ...state, connected: storedConnection.connected }))
-
-    if (storedConnection.connected) await connect()
-  }
-})
+export const connection = writable({ tabId, connected: false, error: null })
 
 export async function connect() {
   console.log('connecting to Webnative')
@@ -87,9 +61,12 @@ export async function connect() {
     }`
   )
 
-  if (err) console.error(err)
-
-  return { connecting }
+  if (!connecting) {
+    connection.update(store => ({...store, error: 'DebugModeOff'}))
+  } else if (err) {
+    connection.update(store => ({...store, error: 'EvalFailed'}))
+    console.error('Inspected window eval error: ', err )
+  }
 }
 
 export async function disconnect() {
@@ -104,55 +81,32 @@ export async function disconnect() {
     }`
   )
 
-  if (err) console.error(err)
-
-  return { disconnecting }
-}
-
-async function reconnect(storedConnection) {
-  console.log('** Content script injected in panel handleShown', contentScriptInjected)
-
-  // Re-inject the content script
-  if (!contentScriptInjected) {
-    backgroundPort.postMessage({
-      type: 'inject',
-      tabId: browser.devtools.inspectedWindow.tabId
-    })
-
-    contentScriptInjected = true
-  }
-
-  console.log('stored connection in reconnect', storedConnection)
-  connection.update(state => ({ ...state, connected: storedConnection.connected }))
-
-  if (storedConnection.connected) {
-    const { connecting } = await connect()
-
-    console.log('connecting status after attempting to reconnect', connecting)
+  if (!disconnecting) {
+    connection.update(store => ({...store, error: 'DebugModeOff'}))
+  } else if (err) {
+    connection.update(store => ({...store, error: 'EvalFailed'}))
+    console.error('Inspected window eval error: ', err )
   }
 }
+
 
 // MESSAGES
 
 export const eventStore = writable([])
 
 function handleBackgroundMessage(event) {
-  console.log('panel port onMessage', event)
+  // console.log('devtools port onMessage', event)
 
   if (event.type === 'connect') {
     console.log('received connect message from Webnative', event)
 
     eventStore.update(history => [...history, event])
-
     connection.update(store => ({ ...store, connected: true }))
-    connectionStorage.set({ tabId, connected: true })
   } else if (event.type === 'disconnect') {
     console.log('received disconnect message from Webnative', event)
 
     eventStore.update(history => [...history, event])
-
     connection.update(store => ({ ...store, connected: false }))
-    connectionStorage.set({ tabId, connected: false })
   } else if (event.type === 'session') {
     console.log('received session event', event)
 
@@ -164,11 +118,13 @@ function handleBackgroundMessage(event) {
   } else if (event.type === 'pageload') {
     console.log('received page load event', event)
 
-    connectionStorage.get(tabId).then(storedConnection => {
-      if (storedConnection?.connected) { 
-        reconnect(storedConnection).catch(err => console.log('Unable to reconnect with Webnative', err))
-      }
+    // Inject content script if missing
+    backgroundPort.postMessage({
+      type: 'inject',
+      tabId: browser.devtools.inspectedWindow.tabId
     })
+    connect()
+
   } else {
     console.log('received an unknown message type', event)
   }

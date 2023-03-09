@@ -1,9 +1,8 @@
 <script lang="ts">
   import { onDestroy } from 'svelte'
   import { JsonView } from '@zerodevx/svelte-json-view'
-  import { connect, connection, disconnect, eventStore } from './devtools'
+  import { connection, eventStore } from './devtools'
 
-  let connectionError = false
   let selectedEvent = null
   let selectedEventIndex
   let events = []
@@ -17,22 +16,6 @@
     }
   })
 
-  async function handleConnect() {
-    connectionError = false
-
-    const { connecting } = await connect()
-
-    if (!connecting) connectionError = true
-  }
-
-  async function handleDisconnect() {
-    connectionError = false
-
-    const disconnecting = await disconnect()
-
-    if (!disconnecting) connectionError = true
-  }
-
   function handleEventClick(index) {
     selectedEvent = events[index]
     selectedEventIndex = index
@@ -43,19 +26,7 @@
 </script>
 
 <div class="panel-wrapper">
-  <div>
-    {#if $connection.connected}
-      <button style="background-color: #bf616a" on:click={handleDisconnect}>
-        Stop
-      </button>
-    {:else}
-      <button style="background-color: #a3be8c" on:click={handleConnect}>
-        Start
-      </button>
-    {/if}
-  </div>
-
-  {#if connectionError}
+  {#if $connection.error === 'DebugModeOff'}
     <div class="connection-error">
       Please make sure Webnative debug mode is set to true. See the
       <a
@@ -68,58 +39,67 @@
       </a>
       for instructions on enabling debug mode.
     </div>
-  {/if}
-
-  <div class="wrapper">
-    <div>
-      {#if events.length > 0}
-        <h3 class="section-label">Event History</h3>
+  {:else}
+    <div class="connection-status">
+      {#if $connection.connected}
+        <div>Connected to Webnative</div>
+        {#if events.length === 0}
+          <div class="no-messages">No messages received yet</div>
+        {/if}
       {/if}
-      <div class="event-history">
-        {#each events as event, index}
-          {#if event.type === 'connect' || event.type === 'disconnect'}
-            <button
-              style:background-color={index === selectedEventIndex
-                ? '#81a1c1'
-                : '#fdfdfe'}
-              on:click={() => handleEventClick(index)}
-            >
-              {event.type}
-            </button>
-          {:else}
-            <button
-              style:background-color={index === selectedEventIndex
-                ? '#81a1c1'
-                : '#fdfdfe'}
-              on:click={() => handleEventClick(index)}
-            >
-              {`${event.type} ${event.detail.type}`}
-            </button>
-          {/if}
-        {/each}
+    </div>
+
+    <div class="wrapper">
+      <div>
+        {#if events.length > 0}
+          <h3 class="section-label">Event History</h3>
+        {/if}
+        <div class="event-history">
+          {#each events as event, index}
+            {#if event.type === 'connect' || event.type === 'disconnect'}
+              <button
+                style:background-color={index === selectedEventIndex
+                  ? '#81a1c1'
+                  : '#fdfdfe'}
+                on:click={() => handleEventClick(index)}
+              >
+                {event.type}
+              </button>
+            {:else}
+              <button
+                style:background-color={index === selectedEventIndex
+                  ? '#81a1c1'
+                  : '#fdfdfe'}
+                on:click={() => handleEventClick(index)}
+              >
+                {`${event.type} ${event.detail.type}`}
+              </button>
+            {/if}
+          {/each}
+        </div>
+      </div>
+
+      <div class="event-section">
+        {#if events.length > 0}
+          <h3 class="section-label">Event</h3>
+        {/if}
+        {#if selectedEvent}
+          <div class="event-wrapper">
+            {#if selectedEvent.detail}
+              <h4 class="section-label">Detail</h4>
+              <div class="jsonview-wrapper">
+                <JsonView json={selectedEvent.detail} />
+              </div>
+            {/if}
+            <h4 class="section-label">State</h4>
+            <div class="jsonview-wrapper">
+              <JsonView json={selectedEvent.state} />
+            </div>
+          </div>
+        {/if}
       </div>
     </div>
-
-    <div class="event-section">
-      {#if events.length > 0}
-        <h3 class="section-label">Event</h3>
-      {/if}
-      {#if selectedEvent}
-        <div class="event-wrapper">
-          {#if selectedEvent.detail}
-            <h4 class="section-label">Detail</h4>
-            <div class="jsonview-wrapper">
-              <JsonView json={selectedEvent.detail} />
-            </div>
-          {/if}
-          <h4 class="section-label">State</h4>
-          <div class="jsonview-wrapper">
-            <JsonView json={selectedEvent.state} />
-          </div>
-        </div>
-      {/if}
-    </div>
-  </div>
+  {/if}
 </div>
 
 <style>
@@ -170,6 +150,17 @@
   .section-label {
     margin: 2px 0 4px 2px;
     white-space: nowrap;
+  }
+
+  .connection-status {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    color: #dddde4;
+  }
+
+  .no-messages {
+    display: grid;
+    justify-content: end;
   }
 
   .connection-error {
