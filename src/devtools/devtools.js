@@ -1,5 +1,7 @@
-import { writable } from 'svelte/store'
+import { get as getStore, writable } from 'svelte/store'
 import browser from 'webextension-polyfill'
+
+import * as messages from '../storage/messages'
 
 console.log(`In devtools.js - tabId: ${browser.devtools.inspectedWindow.tabId}`)
 
@@ -94,11 +96,18 @@ export async function disconnect() {
 
 export const eventStore = writable([])
 
-function handleBackgroundMessage(event) {
-  // console.log('devtools port onMessage', event)
 
+function handleBackgroundMessage(event) {
   if (event.type === 'connect') {
     console.log('received connect message from Webnative', event)
+
+    if (getStore(eventStore).length === 0) {
+      const namespace = event.state.app.namespace 
+
+      messages.get(namespace).then(messages => {
+        eventStore.set(messages)
+      })
+    }
 
     eventStore.update(history => [...history, event])
     connection.update(store => ({ ...store, connected: true }))
@@ -111,10 +120,12 @@ function handleBackgroundMessage(event) {
     console.log('received session event', event)
 
     eventStore.update(history => [...history, event])
+    messages.set(event.state.app.namespace, getStore(eventStore))
   } else if (event.type === 'filesystem') {
     console.log('received filesystem event', event)
 
     eventStore.update(history => [...history, event])
+    messages.set(event.state.app.namespace, getStore(eventStore))
   } else if (event.type === 'pageload') {
     console.log('received page load event', event)
 

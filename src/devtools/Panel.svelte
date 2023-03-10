@@ -1,6 +1,8 @@
 <script lang="ts">
   import { onDestroy } from 'svelte'
   import { JsonView } from '@zerodevx/svelte-json-view'
+
+  import * as messages from '../storage/messages'
   import { connection, eventStore } from './devtools'
 
   let selectedEvent = null
@@ -20,6 +22,10 @@
     selectedEvent = events[index]
     selectedEventIndex = index
     console.log('selected event', selectedEvent)
+  }
+
+  function handleClearMessages() {
+    // messages.clear('Fission/WAT')
   }
 
   onDestroy(unsubscribeEvents)
@@ -43,9 +49,13 @@
     <div class="connection-status">
       {#if $connection.connected}
         <div>Connected to Webnative</div>
-        {#if events.length === 0}
-          <div class="no-messages">No messages received yet</div>
-        {/if}
+        <div class="message-controls">
+          {#if events.length === 0}
+            No messages received yet
+          {:else}
+            <button on:click={handleClearMessages}>Clear</button>
+          {/if}
+        </div>
       {/if}
     </div>
 
@@ -158,9 +168,10 @@
     color: #dddde4;
   }
 
-  .no-messages {
+  .message-controls {
     display: grid;
     justify-content: end;
+    padding-right: 7px;
   }
 
   .connection-error {
