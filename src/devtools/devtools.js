@@ -1,7 +1,7 @@
 import { get as getStore, writable } from 'svelte/store'
 import browser from 'webextension-polyfill'
 
-import * as messages from '../storage/messages'
+import * as messageStorage from '../storage/message'
 
 console.log(`In devtools.js - tabId: ${browser.devtools.inspectedWindow.tabId}`)
 
@@ -94,15 +94,15 @@ export async function disconnect() {
 
 // MESSAGES
 
-export const eventStore = writable([])
+export const messageStore = writable([])
 export const namespaceStore = writable([])
 
 
-function handleBackgroundMessage(event) {
-  if (event.type === 'connect') {
-    console.log('received connect message from Webnative', event)
+function handleBackgroundMessage(message) {
+  if (message.type === 'connect') {
+    console.log('received connect message from Webnative', message)
 
-    const namespace = event.state.app.namespace
+    const namespace = message.state.app.namespace
 
     // Add namespace for connected app
     namespaceStore.update(store =>
@@ -110,32 +110,32 @@ function handleBackgroundMessage(event) {
     )
 
     // Load events from storage
-    if (getStore(eventStore).length === 0) {
+    if (getStore(messageStore).length === 0) {
 
-      messages.get(namespace).then(messages => {
+      messageStorage.get(namespace).then(messages => {
         // TODO Append messages instead of setting
         // Sort messages by timestamp across namespaces
-        eventStore.set(messages)
+        messageStore.set(messages)
       })
     }
 
     connection.update(store => ({ ...store, connected: true }))
-  } else if (event.type === 'disconnect') {
-    console.log('received disconnect message from Webnative', event)
+  } else if (message.type === 'disconnect') {
+    console.log('received disconnect message from Webnative', message)
 
     connection.update(store => ({ ...store, connected: false }))
-  } else if (event.type === 'session') {
-    console.log('received session event', event)
+  } else if (message.type === 'session') {
+    console.log('received session message', message)
 
-    eventStore.update(history => [...history, event])
-    messages.set(event.state.app.namespace, getStore(eventStore))
-  } else if (event.type === 'filesystem') {
-    console.log('received filesystem event', event)
+    messageStore.update(history => [...history, message])
+    messageStorage.set(message.state.app.namespace, getStore(messageStore))
+  } else if (message.type === 'filesystem') {
+    console.log('received filesystem message', message)
 
-    eventStore.update(history => [...history, event])
-    messages.set(event.state.app.namespace, getStore(eventStore))
-  } else if (event.type === 'pageload') {
-    console.log('received page load event', event)
+    messageStore.update(history => [...history, message])
+    messageStorage.set(message.state.app.namespace, getStore(messageStore))
+  } else if (message.type === 'pageload') {
+    console.log('received page load message', message)
 
     // Inject content script if missing
     backgroundPort.postMessage({
@@ -145,6 +145,6 @@ function handleBackgroundMessage(event) {
     connect()
 
   } else {
-    console.log('received an unknown message type', event)
+    console.log('received an unknown message type', message)
   }
 }

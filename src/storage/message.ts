@@ -1,6 +1,6 @@
 import browser from 'webextension-polyfill'
 
-import { type Message, type AppInfo, namespaceToString } from '../messages'
+import { type Message, type AppInfo, namespaceToString } from '../message'
 
 type Messages = {
   [ namespace: string ]: Message[]

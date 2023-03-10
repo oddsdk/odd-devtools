@@ -2,33 +2,33 @@
   import { onDestroy } from 'svelte'
   import { JsonView } from '@zerodevx/svelte-json-view'
 
-  import * as messages from '../storage/messages'
-  import { connection, namespaceStore, eventStore } from './devtools'
-  import { namespaceToString } from '../messages'
+  import * as messageStorage from '../storage/message'
+  import { connection, namespaceStore, messageStore } from './devtools'
+  import { namespaceToString } from '../message'
 
   let selectedEvent = null
   let selectedEventIndex
-  let events = []
+  let messages = []
   let namespaces = []
-  let eventsInitialized = false
+  let messagesInitialized = false
 
-  const unsubscribeEvents = eventStore.subscribe(store => {
-    events = store
+  const unsubscribeEvents = messageStore.subscribe(store => {
+    messages = store
 
     // Select the first message when it arrives
-    if (events.length === 1) {
-      selectedEvent = events[0]
+    if (messages.length === 1) {
+      selectedEvent = messages[0]
       selectedEventIndex = 0
     }
 
     // Select last message at initialization
-    if (!eventsInitialized && events.length > 0) {
-      const lastIndex = events.length - 1
+    if (!messagesInitialized && messages.length > 0) {
+      const lastIndex = messages.length - 1
 
-      selectedEvent = events[lastIndex]
+      selectedEvent = messages[lastIndex]
       selectedEventIndex = lastIndex
 
-      eventsInitialized = true
+      messagesInitialized = true
     }
   })
 
@@ -38,20 +38,24 @@
   })
 
   function handleEventClick(index) {
-    selectedEvent = events[index]
+    selectedEvent = messages[index]
     selectedEventIndex = index
     console.log('selected event', selectedEvent)
   }
 
   function handleClearMessages(namespace: string) {
-    eventStore.update(store =>
+    // Remove messages from memory
+    messageStore.update(store =>
       store.filter(
         event => namespaceToString(event.state.app.namespace) !== namespace
       )
     )
-    selectedEvent = null
 
-    messages.clear(namespace)
+    // Select last remaining remaining message if one exists
+    selectedEvent = messages.length > 0 ? messages[messages.length - 1] : null
+
+    // Remove messages from extension storage
+    messageStorage.clear(namespace)
   }
 
   onDestroy(() => {
@@ -79,7 +83,7 @@
       {#if $connection.connected}
         <div>Connected to Webnative</div>
         <div class="message-controls">
-          {#if events.length === 0}
+          {#if messages.length === 0}
             No messages received yet
           {:else}
             {#each namespaces as namespace}
@@ -98,11 +102,11 @@
 
     <div class="wrapper">
       <div>
-        {#if events.length > 0}
+        {#if messages.length > 0}
           <h3 class="section-label">Event History</h3>
         {/if}
         <div class="event-history">
-          {#each events as event, index}
+          {#each messages as event, index}
             {#if event.type === 'connect' || event.type === 'disconnect'}
               <button
                 style:background-color={index === selectedEventIndex
@@ -127,7 +131,7 @@
       </div>
 
       <div class="event-section">
-        {#if events.length > 0}
+        {#if messages.length > 0}
           <h3 class="section-label">Event</h3>
         {/if}
         {#if selectedEvent}
