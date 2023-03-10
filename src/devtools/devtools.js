@@ -109,12 +109,10 @@ function handleBackgroundMessage(event) {
       })
     }
 
-    eventStore.update(history => [...history, event])
     connection.update(store => ({ ...store, connected: true }))
   } else if (event.type === 'disconnect') {
     console.log('received disconnect message from Webnative', event)
 
-    eventStore.update(history => [...history, event])
     connection.update(store => ({ ...store, connected: false }))
   } else if (event.type === 'session') {
     console.log('received session event', event)
