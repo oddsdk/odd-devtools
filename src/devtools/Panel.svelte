@@ -3,19 +3,38 @@
   import { JsonView } from '@zerodevx/svelte-json-view'
 
   import * as messages from '../storage/messages'
-  import { connection, eventStore } from './devtools'
+  import { connection, namespaceStore, eventStore } from './devtools'
+  import { namespaceToString } from '../messages'
 
   let selectedEvent = null
   let selectedEventIndex
   let events = []
+  let namespaces = []
+  let eventsInitialized = false
 
   const unsubscribeEvents = eventStore.subscribe(store => {
     events = store
 
+    // Select the first message when it arrives
     if (events.length === 1) {
       selectedEvent = events[0]
       selectedEventIndex = 0
     }
+
+    // Select last message at initialization
+    if (!eventsInitialized && events.length > 0) {
+      const lastIndex = events.length - 1
+
+      selectedEvent = events[lastIndex]
+      selectedEventIndex = lastIndex
+
+      eventsInitialized = true
+    }
+  })
+
+  const unsubscribeNamespaces = namespaceStore.subscribe(store => {
+    namespaces = store.map(namespaceToString)
+    console.log('namespaces in subscription', namespaces)
   })
 
   function handleEventClick(index) {
@@ -24,11 +43,21 @@
     console.log('selected event', selectedEvent)
   }
 
-  function handleClearMessages() {
-    // messages.clear('Fission/WAT')
+  function handleClearMessages(namespace: string) {
+    eventStore.update(store =>
+      store.filter(
+        event => namespaceToString(event.state.app.namespace) !== namespace
+      )
+    )
+    selectedEvent = null
+
+    messages.clear(namespace)
   }
 
-  onDestroy(unsubscribeEvents)
+  onDestroy(() => {
+    unsubscribeEvents()
+    unsubscribeNamespaces()
+  })
 </script>
 
 <div class="panel-wrapper">
@@ -53,7 +82,15 @@
           {#if events.length === 0}
             No messages received yet
           {:else}
-            <button on:click={handleClearMessages}>Clear</button>
+            {#each namespaces as namespace}
+              <button
+                class="clear-button"
+                on:click={() => handleClearMessages(namespace)}
+              >
+                <span>x</span>
+                {namespace}
+              </button>
+            {/each}
           {/if}
         </div>
       {/if}
@@ -194,5 +231,17 @@
     background-color: #fefefe;
     border: 1px solid transparent;
     border-radius: 3px;
+  }
+
+  .clear-button {
+    background-color: #eceff4;
+    font-size: 10px;
+  }
+
+  .clear-button > span {
+    display: inline-block;
+    transform: translateY(-1px);
+    padding-right: 2px;
+    color: #3b4252;
   }
 </style>

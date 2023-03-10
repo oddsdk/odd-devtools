@@ -95,16 +95,26 @@ export async function disconnect() {
 // MESSAGES
 
 export const eventStore = writable([])
+export const namespaceStore = writable([])
 
 
 function handleBackgroundMessage(event) {
   if (event.type === 'connect') {
     console.log('received connect message from Webnative', event)
 
+    const namespace = event.state.app.namespace
+
+    // Add namespace for connected app
+    namespaceStore.update(store =>
+      store.filter(ns => ns === namespace).concat(namespace)
+    )
+
+    // Load events from storage
     if (getStore(eventStore).length === 0) {
-      const namespace = event.state.app.namespace 
 
       messages.get(namespace).then(messages => {
+        // TODO Append messages instead of setting
+        // Sort messages by timestamp across namespaces
         eventStore.set(messages)
       })
     }
