@@ -1,42 +1,10 @@
 import browser from 'webextension-polyfill'
 
+import { type Message, type AppInfo, namespaceToString } from '../messages'
+
 type Messages = {
   [ namespace: string ]: Message[]
 }
-
-type Message = {
-  type: 'session' | 'filesystem'
-  state: State
-  detail: Detail
-}
-
-type State = {
-  app: {
-    version: string
-    namespace: AppInfo | string
-    capabilities?: Permissions
-  }
-  filesystem: {
-    dataRootCID: string | null
-  }
-  user: {
-    username: string | null
-    accountDID: string | null
-    agentDID: string
-  }
-}
-
-type Detail =
-  { type: 'create', username: string } |
-  { type: 'destroy', username: string } |
-  { type: 'local-change', root: string, path: object } |
-  { type: 'publish', root: string }
-
-type AppInfo = {
-  name: string
-  creator: string
-}
-
 
 export async function get(namespace: AppInfo | string): Promise<Message[]> {
   const ns = namespaceToString(namespace)
@@ -91,11 +59,4 @@ export async function clear(namespace: AppInfo | string): Promise<void> {
 
   browser.storage.local.set({ messages: store.messages })
     .catch(err => console.error('Browser storage error:', err))
-}
-
-
-export function namespaceToString(namespace: AppInfo | string): string {
-  return typeof namespace === 'string' ?
-    namespace :
-    `${namespace.creator}/${namespace.name}`
 }
