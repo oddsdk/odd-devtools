@@ -57,8 +57,24 @@
       )
     )
 
-    // Select last remaining remaining message if one exists
-    selectedMessage = messages.length > 0 ? messages[messages.length - 1] : null
+    // Update selected message and index
+    if (messages.length > 0) {
+      if (messages.includes(selectedMessage)) {
+        selectedMessageIndex = messages.findIndex(
+          message => message.timestamp === selectedMessage.timestamp
+        )
+
+        selectedMessage = messages[selectedMessageIndex]
+      } else {
+        const lastIndex = messages.length - 1
+
+        selectedMessageIndex = lastIndex
+        selectedMessage = messages[lastIndex]
+      }
+    } else {
+      selectedMessage = null
+      messagesInitialized = false
+    }
 
     // Remove messages from extension storage
     messageStorage.clear(namespace)
