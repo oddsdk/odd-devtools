@@ -10,21 +10,21 @@
   let selectedMessageIndex
   let namespaces = []
   let messages = []
-  let messagesInitialized = false
+  let initialMessageSelected = false
 
   const unsubscribeMessages = messageStore.subscribe(store => {
     messages = store
 
     // Set selected message
     if (messages.length > 0) {
-      if (!messagesInitialized) {
+      if (!initialMessageSelected) {
         const lastIndex = messages.length - 1
 
         // Select last message at initialization
         selectedMessageIndex = lastIndex
         selectedMessage = messages[selectedMessageIndex]
 
-        messagesInitialized = true
+        initialMessageSelected = true
       } else {
         // Update selected when messages are added or removed
         selectedMessageIndex = messages.findIndex(
@@ -73,7 +73,7 @@
       }
     } else {
       selectedMessage = null
-      messagesInitialized = false
+      initialMessageSelected = false
     }
 
     // Remove messages from extension storage
