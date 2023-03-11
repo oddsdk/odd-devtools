@@ -12,7 +12,7 @@
   let messages = []
   let messagesInitialized = false
 
-  const unsubscribeEvents = messageStore.subscribe(store => {
+  const unsubscribeMessages = messageStore.subscribe(store => {
     messages = store
 
     // Set selected message
@@ -37,25 +37,23 @@
   })
 
   const unsubscribeNamespaces = namespaceStore.subscribe(store => {
-    namespaces = store.map(namespaceToString)
+    namespaces = store
     console.log('namespaces in subscription', namespaces)
   })
 
-  function handleEventClick(index) {
+  function handleMessageClick(index) {
     selectedMessage = messages[index]
     selectedMessageIndex = index
-    console.log('selected event', selectedMessage)
+    console.log('selected message', selectedMessage)
   }
 
   function handleClearMessages(namespace: string) {
-    namespaceStore.update(store =>
-      store.filter(ns => namespaceToString(ns) !== namespace)
-    )
+    namespaceStore.update(store => store.filter(ns => ns !== namespace))
 
     // Remove messages from memory
     messageStore.update(store =>
       store.filter(
-        event => namespaceToString(event.state.app.namespace) !== namespace
+        message => namespaceToString(message.state.app.namespace) !== namespace
       )
     )
 
@@ -67,7 +65,7 @@
   }
 
   onDestroy(() => {
-    unsubscribeEvents()
+    unsubscribeMessages()
     unsubscribeNamespaces()
   })
 </script>
@@ -111,39 +109,39 @@
     <div class="wrapper">
       <div>
         {#if messages.length > 0}
-          <h3 class="section-label">Event History</h3>
+          <h3 class="section-label">Message History</h3>
         {/if}
-        <div class="event-history">
-          {#each messages as event, index}
-            {#if event.type === 'connect' || event.type === 'disconnect'}
+        <div class="message-history">
+          {#each messages as message, index}
+            {#if message.type === 'connect' || message.type === 'disconnect'}
               <button
                 style:background-color={index === selectedMessageIndex
                   ? '#81a1c1'
                   : '#fdfdfe'}
-                on:click={() => handleEventClick(index)}
+                on:click={() => handleMessageClick(index)}
               >
-                {event.type}
+                {message.type}
               </button>
             {:else}
               <button
                 style:background-color={index === selectedMessageIndex
                   ? '#81a1c1'
                   : '#fdfdfe'}
-                on:click={() => handleEventClick(index)}
+                on:click={() => handleMessageClick(index)}
               >
-                {`${event.type} ${event.detail.type}`}
+                {`${message.type} ${message.detail.type}`}
               </button>
             {/if}
           {/each}
         </div>
       </div>
 
-      <div class="event-section">
+      <div class="message-section">
         {#if messages.length > 0}
-          <h3 class="section-label">Event</h3>
+          <h3 class="section-label">Message</h3>
         {/if}
         {#if selectedMessage}
-          <div class="event-wrapper">
+          <div class="message-wrapper">
             {#if selectedMessage.detail}
               <h4 class="section-label">Detail</h4>
               <div class="jsonview-wrapper">
@@ -184,13 +182,13 @@
     gap: 10px;
   }
 
-  .event-section {
+  .message-section {
     display: flex;
     flex-direction: column;
     align-items: stretch;
   }
 
-  .event-wrapper {
+  .message-wrapper {
     height: 100%;
     padding: 4px;
     background-color: #fdfdfe;
@@ -200,7 +198,7 @@
     overflow: auto;
   }
 
-  .event-history {
+  .message-history {
     display: grid;
     grid-template-columns: masonry;
     gap: 2px;

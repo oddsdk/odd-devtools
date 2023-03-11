@@ -103,20 +103,14 @@ function handleBackgroundMessage(message) {
   if (message.type === 'connect') {
     console.log('received connect message from Webnative', message)
 
-    const namespace = message.state.app.namespace
-
-    // Add namespace for connected app
-    // namespaceStore.update(store =>
-    //   store.filter(ns => namespaceToString(ns) !== namespaceToString(namespace)).concat(namespace)
-    // )
+    const namespace = namespaceToString(message.state.app.namespace)
 
     messageStorage.get(namespace).then(messages => {
-
-      // Add namespace if messages
+      // Add namespace as string if messages
       if (messages.length > 0) {
         namespaceStore.update(store =>
           store
-            .filter(ns => namespaceToString(ns) !== namespaceToString(namespace))
+            .filter(ns => ns !== namespace)
             .concat(namespace)
         )
       }
@@ -124,7 +118,7 @@ function handleBackgroundMessage(message) {
       // Add and sort messages
       messageStore.update(store =>
         store
-          .filter(message => namespaceToString(message.state.app.namespace) !== namespaceToString(namespace))
+          .filter(message => namespaceToString(message.state.app.namespace) !== namespace)
           .concat(messages)
           .sort((a, b) => a.timestamp - b.timestamp)
       )
@@ -141,7 +135,7 @@ function handleBackgroundMessage(message) {
     messageStore.update(history => [...history, message])
 
     const namespace = namespaceToString(message.state.app.namespace)
-    namespaceStore.update(store => store.filter(ns => namespaceToString(ns) !== namespaceToString(namespace)).concat(namespace))
+    namespaceStore.update(store => store.filter(ns => ns !== namespace).concat(namespace))
 
     const associatedMessages = getStore(messageStore).filter(m => namespaceToString(m.state.app.namespace) === namespace)
     messageStorage.set(namespace, associatedMessages)
@@ -151,14 +145,14 @@ function handleBackgroundMessage(message) {
     messageStore.update(history => [...history, message])
 
     const namespace = namespaceToString(message.state.app.namespace)
-    namespaceStore.update(store => store.filter(ns => namespaceToString(ns) !== namespaceToString(namespace)).concat(namespace))
+    namespaceStore.update(store => store.filter(ns => ns !== namespace).concat(namespace))
 
     const associatedMessages = getStore(messageStore).filter(m => namespaceToString(m.state.app.namespace) === namespace)
     messageStorage.set(namespace, associatedMessages)
   } else if (message.type === 'pageload') {
     console.log('received page load message', message)
 
-    // Inject content script if missing
+    // Inject content script
     backgroundPort.postMessage({
       type: 'inject',
       tabId: browser.devtools.inspectedWindow.tabId
