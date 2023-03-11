@@ -2,6 +2,7 @@ import { get as getStore, writable } from 'svelte/store'
 import browser from 'webextension-polyfill'
 
 import * as messageStorage from '../storage/message'
+import { namespaceToString } from '../message'
 
 console.log(`In devtools.js - tabId: ${browser.devtools.inspectedWindow.tabId}`)
 
@@ -64,10 +65,10 @@ export async function connect() {
   )
 
   if (!connecting) {
-    connection.update(store => ({...store, error: 'DebugModeOff'}))
+    connection.update(store => ({ ...store, error: 'DebugModeOff' }))
   } else if (err) {
-    connection.update(store => ({...store, error: 'EvalFailed'}))
-    console.error('Inspected window eval error: ', err )
+    connection.update(store => ({ ...store, error: 'EvalFailed' }))
+    console.error('Inspected window eval error: ', err)
   }
 }
 
@@ -84,10 +85,10 @@ export async function disconnect() {
   )
 
   if (!disconnecting) {
-    connection.update(store => ({...store, error: 'DebugModeOff'}))
+    connection.update(store => ({ ...store, error: 'DebugModeOff' }))
   } else if (err) {
-    connection.update(store => ({...store, error: 'EvalFailed'}))
-    console.error('Inspected window eval error: ', err )
+    connection.update(store => ({ ...store, error: 'EvalFailed' }))
+    console.error('Inspected window eval error: ', err)
   }
 }
 
@@ -105,19 +106,29 @@ function handleBackgroundMessage(message) {
     const namespace = message.state.app.namespace
 
     // Add namespace for connected app
-    namespaceStore.update(store =>
-      store.filter(ns => ns === namespace).concat(namespace)
-    )
+    // namespaceStore.update(store =>
+    //   store.filter(ns => namespaceToString(ns) !== namespaceToString(namespace)).concat(namespace)
+    // )
 
-    // Load events from storage
-    if (getStore(messageStore).length === 0) {
+    messageStorage.get(namespace).then(messages => {
 
-      messageStorage.get(namespace).then(messages => {
-        // TODO Append messages instead of setting
-        // Sort messages by timestamp across namespaces
-        messageStore.set(messages)
-      })
-    }
+      // Add namespace if messages
+      if (messages.length > 0) {
+        namespaceStore.update(store =>
+          store
+            .filter(ns => namespaceToString(ns) !== namespaceToString(namespace))
+            .concat(namespace)
+        )
+      }
+
+      // Add and sort messages
+      messageStore.update(store =>
+        store
+          .filter(message => namespaceToString(message.state.app.namespace) !== namespaceToString(namespace))
+          .concat(messages)
+          .sort((a, b) => a.timestamp - b.timestamp)
+      )
+    })
 
     connection.update(store => ({ ...store, connected: true }))
   } else if (message.type === 'disconnect') {
@@ -128,12 +139,22 @@ function handleBackgroundMessage(message) {
     console.log('received session message', message)
 
     messageStore.update(history => [...history, message])
-    messageStorage.set(message.state.app.namespace, getStore(messageStore))
+
+    const namespace = namespaceToString(message.state.app.namespace)
+    namespaceStore.update(store => store.filter(ns => namespaceToString(ns) !== namespaceToString(namespace)).concat(namespace))
+
+    const associatedMessages = getStore(messageStore).filter(m => namespaceToString(m.state.app.namespace) === namespace)
+    messageStorage.set(namespace, associatedMessages)
   } else if (message.type === 'filesystem') {
     console.log('received filesystem message', message)
 
     messageStore.update(history => [...history, message])
-    messageStorage.set(message.state.app.namespace, getStore(messageStore))
+
+    const namespace = namespaceToString(message.state.app.namespace)
+    namespaceStore.update(store => store.filter(ns => namespaceToString(ns) !== namespaceToString(namespace)).concat(namespace))
+
+    const associatedMessages = getStore(messageStore).filter(m => namespaceToString(m.state.app.namespace) === namespace)
+    messageStorage.set(namespace, associatedMessages)
   } else if (message.type === 'pageload') {
     console.log('received page load message', message)
 

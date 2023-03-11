@@ -12,6 +12,8 @@ export async function get(namespace: AppInfo | string): Promise<Message[]> {
   const store: Messages = await browser.storage.local.get('messages')
   let storedMessages
 
+  console.log('message store in get', store)
+
   if (store && store.messages) {
     storedMessages = store.messages[ `${ns}` ]
 
@@ -34,7 +36,7 @@ export async function set(namespace: AppInfo | string, messages: Message[]) {
   // Add or update the connection to the connections object
   store.messages[ `${ns}` ] = messages
 
-  console.log('storing connections as', store)
+  console.log('storing messages as', store)
 
   // Store it
   browser.storage.local.set({ messages: store.messages })

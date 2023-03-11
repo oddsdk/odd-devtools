@@ -6,29 +6,33 @@
   import { connection, namespaceStore, messageStore } from './devtools'
   import { namespaceToString } from '../message'
 
-  let selectedEvent = null
-  let selectedEventIndex
-  let messages = []
+  let selectedMessage = null
+  let selectedMessageIndex
   let namespaces = []
+  let messages = []
   let messagesInitialized = false
 
   const unsubscribeEvents = messageStore.subscribe(store => {
     messages = store
 
-    // Select the first message when it arrives
-    if (messages.length === 1) {
-      selectedEvent = messages[0]
-      selectedEventIndex = 0
-    }
+    // Set selected message
+    if (messages.length > 0) {
+      if (!messagesInitialized) {
+        const lastIndex = messages.length - 1
 
-    // Select last message at initialization
-    if (!messagesInitialized && messages.length > 0) {
-      const lastIndex = messages.length - 1
+        // Select last message at initialization
+        selectedMessageIndex = lastIndex
+        selectedMessage = messages[selectedMessageIndex]
 
-      selectedEvent = messages[lastIndex]
-      selectedEventIndex = lastIndex
+        messagesInitialized = true
+      } else {
+        // Update selected when messages are added or removed
+        selectedMessageIndex = messages.findIndex(
+          message => message.timestamp === selectedMessage.timestamp
+        )
 
-      messagesInitialized = true
+        selectedMessage = messages[selectedMessageIndex]
+      }
     }
   })
 
@@ -38,12 +42,16 @@
   })
 
   function handleEventClick(index) {
-    selectedEvent = messages[index]
-    selectedEventIndex = index
-    console.log('selected event', selectedEvent)
+    selectedMessage = messages[index]
+    selectedMessageIndex = index
+    console.log('selected event', selectedMessage)
   }
 
   function handleClearMessages(namespace: string) {
+    namespaceStore.update(store =>
+      store.filter(ns => namespaceToString(ns) !== namespace)
+    )
+
     // Remove messages from memory
     messageStore.update(store =>
       store.filter(
@@ -52,7 +60,7 @@
     )
 
     // Select last remaining remaining message if one exists
-    selectedEvent = messages.length > 0 ? messages[messages.length - 1] : null
+    selectedMessage = messages.length > 0 ? messages[messages.length - 1] : null
 
     // Remove messages from extension storage
     messageStorage.clear(namespace)
@@ -109,7 +117,7 @@
           {#each messages as event, index}
             {#if event.type === 'connect' || event.type === 'disconnect'}
               <button
-                style:background-color={index === selectedEventIndex
+                style:background-color={index === selectedMessageIndex
                   ? '#81a1c1'
                   : '#fdfdfe'}
                 on:click={() => handleEventClick(index)}
@@ -118,7 +126,7 @@
               </button>
             {:else}
               <button
-                style:background-color={index === selectedEventIndex
+                style:background-color={index === selectedMessageIndex
                   ? '#81a1c1'
                   : '#fdfdfe'}
                 on:click={() => handleEventClick(index)}
@@ -134,17 +142,17 @@
         {#if messages.length > 0}
           <h3 class="section-label">Event</h3>
         {/if}
-        {#if selectedEvent}
+        {#if selectedMessage}
           <div class="event-wrapper">
-            {#if selectedEvent.detail}
+            {#if selectedMessage.detail}
               <h4 class="section-label">Detail</h4>
               <div class="jsonview-wrapper">
-                <JsonView json={selectedEvent.detail} />
+                <JsonView json={selectedMessage.detail} />
               </div>
             {/if}
             <h4 class="section-label">State</h4>
             <div class="jsonview-wrapper">
-              <JsonView json={selectedEvent.state} />
+              <JsonView json={selectedMessage.state} />
             </div>
           </div>
         {/if}
@@ -211,7 +219,9 @@
 
   .message-controls {
     display: grid;
+    grid-auto-flow: column;
     justify-content: end;
+    gap: 2px;
     padding-right: 7px;
   }
 
