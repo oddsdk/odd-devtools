@@ -1,14 +1,22 @@
 <script lang="ts">
+  import { fade } from 'svelte/transition'
   import { onDestroy } from 'svelte'
   import { JsonView } from '@zerodevx/svelte-json-view'
 
   import * as messageStorage from '../storage/message'
   import { connection, namespaceStore, messageStore } from './devtools'
   import { namespaceToString } from '../message'
+  import ToggleLeftIcon from './icons/ToggleLeft.svelte'
+  import ToggleRightIcon from './icons/ToggleRight.svelte'
+  import TrashIcon from './icons/Trash.svelte'
+  import XIcon from './icons/X.svelte'
+
+  type NamespaceControlsMode = 'clear-session' | 'remove-history'
 
   let selectedMessage = null
   let selectedMessageIndex
   let namespaces = []
+  let namespaceControlsMode: NamespaceControlsMode = 'clear-session'
   let messages = []
   let initialMessageSelected = false
 
@@ -48,6 +56,17 @@
   }
 
   function handleClearMessages(namespace: string) {
+    clearMessages(namespace)
+  }
+
+  function handleRemoveMessages(namespace: string) {
+    namespaceControlsMode = 'clear-session'
+
+    clearMessages(namespace)
+    messageStorage.clear(namespace)
+  }
+
+  function clearMessages(namespace: string) {
     namespaceStore.update(store => store.filter(ns => ns !== namespace))
 
     // Remove messages from memory
@@ -75,9 +94,10 @@
       selectedMessage = null
       initialMessageSelected = false
     }
+  }
 
-    // Remove messages from extension storage
-    messageStorage.clear(namespace)
+  function toggleNamespaceMode(mode: NamespaceControlsMode) {
+    namespaceControlsMode = mode
   }
 
   onDestroy(() => {
@@ -109,14 +129,45 @@
             No messages received yet
           {:else}
             {#each namespaces as namespace}
-              <button
-                class="clear-button"
-                on:click={() => handleClearMessages(namespace)}
-              >
-                <span>x</span>
-                {namespace}
-              </button>
+              {#if namespaceControlsMode === 'clear-session'}
+                <button
+                  in:fade={{ duration: 50 }}
+                  class="clear-session-button"
+                  on:click={() => handleClearMessages(namespace)}
+                >
+                  <span><XIcon /></span>
+                  {namespace}
+                </button>
+              {:else}
+                <button
+                  in:fade={{ duration: 50 }}
+                  class="remove-history-button"
+                  on:click={() => handleRemoveMessages(namespace)}
+                >
+                  <span><TrashIcon /></span>
+                  {namespace}
+                </button>
+              {/if}
             {/each}
+            <div style="margin-left: 2px; transform: translateY(1px)">
+              {#if namespaceControlsMode === 'clear-session'}
+                <span
+                  in:fade={{ duration: 10 }}
+                  on:click={() => toggleNamespaceMode('remove-history')}
+                  on:keyup={() => toggleNamespaceMode('remove-history')}
+                >
+                  <ToggleLeftIcon />
+                </span>
+              {:else}
+                <span
+                  in:fade={{ duration: 10 }}
+                  on:click={() => toggleNamespaceMode('clear-session')}
+                  on:keyup={() => toggleNamespaceMode('clear-session')}
+                >
+                  <ToggleRightIcon />
+                </span>
+              {/if}
+            </div>
           {/if}
         </div>
       {/if}
@@ -236,7 +287,6 @@
     grid-auto-flow: column;
     justify-content: end;
     gap: 2px;
-    padding-right: 7px;
   }
 
   .connection-error {
@@ -261,15 +311,25 @@
     border-radius: 3px;
   }
 
-  .clear-button {
+  .clear-session-button {
     background-color: #eceff4;
     font-size: 10px;
+    padding: 0 6px 0 2px;
   }
 
-  .clear-button > span {
+  .remove-history-button {
+    background-color: #ba1607;
+    color: #fdfdfe;
+    font-size: 10px;
+    padding: 0 6px 0 2px;
+  }
+
+  .clear-session-button > span {
     display: inline-block;
-    transform: translateY(-1px);
-    padding-right: 2px;
-    color: #3b4252;
+    transform: translate(0.5px, 1.5px);
+  }
+  .remove-history-button > span {
+    display: inline-block;
+    transform: translateY(1px);
   }
 </style>

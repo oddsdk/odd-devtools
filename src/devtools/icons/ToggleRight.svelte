@@ -1,0 +1,15 @@
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  width="14"
+  height="14"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="1"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  class="feather feather-toggle-right"
+>
+  <rect x="1" y="5" width="22" height="14" rx="7" ry="7" />
+  <circle cx="16" cy="12" r="3" />
+</svg>

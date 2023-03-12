@@ -106,12 +106,10 @@ function handleBackgroundMessage(message) {
     const namespace = namespaceToString(message.state.app.namespace)
 
     messageStorage.get(namespace).then(messages => {
-      // Add namespace as string if messages
+      // Add namespace if messages
       if (messages.length > 0) {
         namespaceStore.update(store =>
-          store
-            .filter(ns => ns !== namespace)
-            .concat(namespace)
+          [namespace, ...store.filter(ns => ns !== namespace)]
         )
       }
 
@@ -135,7 +133,7 @@ function handleBackgroundMessage(message) {
     messageStore.update(history => [...history, message])
 
     const namespace = namespaceToString(message.state.app.namespace)
-    namespaceStore.update(store => store.filter(ns => ns !== namespace).concat(namespace))
+    namespaceStore.update(store => [namespace, ...store.filter(ns => ns !== namespace)])
 
     const associatedMessages = getStore(messageStore).filter(m => namespaceToString(m.state.app.namespace) === namespace)
     messageStorage.set(namespace, associatedMessages)
@@ -145,7 +143,7 @@ function handleBackgroundMessage(message) {
     messageStore.update(history => [...history, message])
 
     const namespace = namespaceToString(message.state.app.namespace)
-    namespaceStore.update(store => store.filter(ns => ns !== namespace).concat(namespace))
+    namespaceStore.update(store => [namespace, ...store.filter(ns => ns !== namespace)])
 
     const associatedMessages = getStore(messageStore).filter(m => namespaceToString(m.state.app.namespace) === namespace)
     messageStorage.set(namespace, associatedMessages)
