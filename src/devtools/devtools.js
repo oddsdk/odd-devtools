@@ -95,7 +95,8 @@ export async function disconnect() {
 
 // MESSAGES
 
-export const messageStore = writable([])
+// export const messageStore = writable([])
+export const messageStore = writable({ history: [], session: [] })
 export const namespaceStore = writable([])
 
 
@@ -113,13 +114,18 @@ function handleBackgroundMessage(message) {
         )
       }
 
-      // Add and sort messages
-      messageStore.update(store =>
-        store
-          .filter(message => namespaceToString(message.state.app.namespace) !== namespace)
-          .concat(messages)
-          .sort((a, b) => a.timestamp - b.timestamp)
-      )
+      // Add messages to history array if not session array
+      const session = getStore(messageStore).session
+      const history = messages.filter(message => !session.includes(message))
+
+      messageStore.update(store => (
+        { ...store,
+          history: store.history
+            .filter(message => namespaceToString(message.state.app.namespace) !== namespace)
+            .concat(history)
+            .sort((a, b) => a.timestamp - b.timestamp)
+        }
+      ))
     })
 
     connection.update(store => ({ ...store, connected: true }))
@@ -130,23 +136,25 @@ function handleBackgroundMessage(message) {
   } else if (message.type === 'session') {
     console.log('received session message', message)
 
-    messageStore.update(history => [...history, message])
+    messageStore.update(store => ({ ...store, session: [...store.session, message]}))
 
     const namespace = namespaceToString(message.state.app.namespace)
     namespaceStore.update(store => [namespace, ...store.filter(ns => ns !== namespace)])
 
-    const associatedMessages = getStore(messageStore).filter(m => namespaceToString(m.state.app.namespace) === namespace)
-    messageStorage.set(namespace, associatedMessages)
+    messageStorage.get(namespace).then(storedMessages => {
+      messageStorage.set(namespace, [...storedMessages, message])
+    })
   } else if (message.type === 'filesystem') {
     console.log('received filesystem message', message)
 
-    messageStore.update(history => [...history, message])
+    messageStore.update(store => ({ ...store, session: [...store.session, message]}))
 
     const namespace = namespaceToString(message.state.app.namespace)
     namespaceStore.update(store => [namespace, ...store.filter(ns => ns !== namespace)])
 
-    const associatedMessages = getStore(messageStore).filter(m => namespaceToString(m.state.app.namespace) === namespace)
-    messageStorage.set(namespace, associatedMessages)
+    messageStorage.get(namespace).then(storedMessages => {
+      messageStorage.set(namespace, [...storedMessages, message])
+    })
   } else if (message.type === 'pageload') {
     console.log('received page load message', message)
 

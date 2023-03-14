@@ -12,87 +12,185 @@
   import XIcon from './icons/X.svelte'
 
   type NamespaceControlsMode = 'clear-session' | 'remove-history'
+  type MessageReference = { log: 'history' | 'session'; index: number }
 
   let selectedMessage = null
-  let selectedMessageIndex
+  let selectedMessageRef: MessageReference = null
   let namespaces = []
   let namespaceControlsMode: NamespaceControlsMode = 'clear-session'
-  let messages = []
-  let initialMessageSelected = false
+  let messages = {
+    history: [],
+    session: []
+  }
+  let showHistory = false
 
   const unsubscribeMessages = messageStore.subscribe(store => {
     messages = store
 
     // Set selected message
-    if (messages.length > 0) {
-      if (!initialMessageSelected) {
-        const lastIndex = messages.length - 1
+    if (!selectedMessageRef) {
+      if (messages.session.length > 0) {
+        const lastIndex = messages.session.length - 1
 
-        // Select last message at initialization
-        selectedMessageIndex = lastIndex
-        selectedMessage = messages[selectedMessageIndex]
+        selectedMessageRef = { log: 'session', index: lastIndex }
+        selectedMessage = messages.session[lastIndex]
+      } else if (showHistory && messages.history.length > 0) {
+        const lastIndex = messages.history.length - 1
 
-        initialMessageSelected = true
+        selectedMessageRef = { log: 'history', index: lastIndex }
+        selectedMessage = messages.history[lastIndex]
+      }
+    } else {
+      if (selectedMessageRef.log === 'session') {
+        if (messages.session.length > 0) {
+          // Set new message ref and update selected message
+          const selectedMessageIndex = messages.session.findIndex(
+            message => message.timestamp === selectedMessage.timestamp
+          )
+
+          selectedMessageRef = { log: 'session', index: selectedMessageIndex }
+          selectedMessage = messages.session[selectedMessageIndex]
+        } else if (messages.history.length > 0) {
+          // Set new ref and message from history log
+          selectedMessageRef = {
+            log: 'history',
+            index: messages.history.length - 1
+          }
+          selectedMessage = messages.history[selectedMessageRef.index]
+        } else {
+          selectedMessageRef = null
+          selectedMessage = null
+        }
       } else {
-        // Update selected when messages are added or removed
-        selectedMessageIndex = messages.findIndex(
-          message => message.timestamp === selectedMessage.timestamp
-        )
+        if (messages.history.length > 0) {
+          // Set new message ref and update selected message
+          const selectedMessageIndex = messages.history.findIndex(
+            message => message.timestamp === selectedMessage.timestamp
+          )
 
-        selectedMessage = messages[selectedMessageIndex]
+          selectedMessageRef = { log: 'history', index: selectedMessageIndex }
+          selectedMessage = messages.history[selectedMessageIndex]
+        } else if (messages.session.length > 0) {
+          // Set new ref and message from session log
+          selectedMessageRef = {
+            log: 'session',
+            index: messages.session.length - 1
+          }
+          selectedMessage = messages.session[selectedMessageRef.index]
+        } else {
+          selectedMessageRef = null
+          selectedMessage = null
+        }
       }
     }
   })
 
   const unsubscribeNamespaces = namespaceStore.subscribe(store => {
     namespaces = store
-    console.log('namespaces in subscription', namespaces)
   })
 
-  function handleMessageClick(index) {
-    selectedMessage = messages[index]
-    selectedMessageIndex = index
-    console.log('selected message', selectedMessage)
+  function handleMessageClick(log: 'history' | 'session', index: number) {
+    selectedMessageRef = { log, index }
+    selectedMessage = messages[log][index]
   }
 
   function handleClearMessages(namespace: string) {
-    clearMessages(namespace)
+    // Move session messages to history log then sort by timestamp
+    messageStore.update(store => {
+      const clearedMessages = store.session.filter(
+        message => namespaceToString(message.state.app.namespace) === namespace
+      )
+
+      return {
+        history: [...store.history, ...clearedMessages].sort(
+          (a, b) => a.timestamp - b.timestamp
+        ),
+        session: store.session.filter(
+          message =>
+            namespaceToString(message.state.app.namespace) !== namespace
+        )
+      }
+    })
+
+    selectMostRecentMessage()
   }
 
   function handleRemoveMessages(namespace: string) {
-    namespaceControlsMode = 'clear-session'
-
-    clearMessages(namespace)
-    messageStorage.clear(namespace)
-  }
-
-  function clearMessages(namespace: string) {
     namespaceStore.update(store => store.filter(ns => ns !== namespace))
 
-    // Remove messages from memory
-    messageStore.update(store =>
-      store.filter(
-        message => namespaceToString(message.state.app.namespace) !== namespace
-      )
-    )
-
-    // Update selected message and index
-    if (messages.length > 0) {
-      if (messages.includes(selectedMessage)) {
-        selectedMessageIndex = messages.findIndex(
-          message => message.timestamp === selectedMessage.timestamp
+    // Clear messages from session and history logs
+    messageStore.update(store => {
+      return {
+        session: store.session.filter(
+          message =>
+            namespaceToString(message.state.app.namespace) !== namespace
+        ),
+        history: store.history.filter(
+          message =>
+            namespaceToString(message.state.app.namespace) !== namespace
         )
+      }
+    })
 
-        selectedMessage = messages[selectedMessageIndex]
-      } else {
-        const lastIndex = messages.length - 1
+    // Remove messages from storage
+    messageStorage.clear(namespace)
 
-        selectedMessageIndex = lastIndex
-        selectedMessage = messages[lastIndex]
+    selectMostRecentMessage()
+    namespaceControlsMode = 'clear-session'
+  }
+
+  function selectMostRecentMessage() {
+    // Select last message in session log, history log, or set null
+    if (messages.session.length > 0) {
+      selectedMessageRef = {
+        log: 'session',
+        index: messages.session.length - 1
+      }
+      selectedMessage = messages.session[selectedMessageRef.index]
+    } else if (showHistory && messages.history.length > 0) {
+      selectedMessageRef = {
+        log: 'history',
+        index: messages.history.length - 1
+      }
+      selectedMessage = messages.history[selectedMessageRef.index]
+    } else {
+      selectedMessageRef = null
+      selectedMessage = null
+    }
+  }
+
+  function toggleShowHistory(event: { currentTarget: HTMLInputElement }) {
+    showHistory = event.currentTarget.checked
+
+    if (showHistory) {
+      // Select last message in history log if it has entries or null,
+      // otherwise leave selected message unchanged
+      if (!selectedMessageRef) {
+        // select last message in history log
+        if (messages.history.length > 0) {
+          // set ref and selected to last in history log
+          selectedMessageRef = {
+            log: 'history',
+            index: messages.history.length - 1
+          }
+          selectedMessage = messages.history[selectedMessageRef.index]
+        }
       }
     } else {
-      selectedMessage = null
-      initialMessageSelected = false
+      // Select last message in session log if it has
+      // entries, otherwise set selected to null
+      if (selectedMessageRef?.log === 'history') {
+        if (messages.session.length > 0) {
+          selectedMessageRef = {
+            log: 'session',
+            index: messages.session.length - 1
+          }
+          selectedMessage = messages.session[selectedMessageRef.index]
+        } else {
+          selectedMessageRef = null
+          selectedMessage = null
+        }
+      }
     }
   }
 
@@ -124,12 +222,16 @@
     <div class="connection-status">
       {#if $connection.connected}
         <div>Connected to Webnative</div>
+        <div class="show-history-control">
+          <input type="checkbox" on:change={toggleShowHistory} />
+          <span>Show history</span>
+        </div>
         <div class="message-controls">
-          {#if messages.length === 0}
-            No messages received yet
+          {#if (!showHistory && messages.session.length === 0) || (showHistory && messages.session.length === 0 && messages.history.length === 0)}
+            No messages to display
           {:else}
             {#each namespaces as namespace}
-              {#if namespaceControlsMode === 'clear-session'}
+              {#if namespaceControlsMode === 'clear-session' && messages.session.some(message => namespaceToString(message.state.app.namespace) === namespace)}
                 <button
                   in:fade={{ duration: 50 }}
                   class="clear-session-button"
@@ -138,7 +240,7 @@
                   <span><XIcon /></span>
                   {namespace}
                 </button>
-              {:else}
+              {:else if namespaceControlsMode === 'remove-history'}
                 <button
                   in:fade={{ duration: 50 }}
                   class="remove-history-button"
@@ -175,37 +277,42 @@
 
     <div class="wrapper">
       <div>
-        {#if messages.length > 0}
-          <h3 class="section-label">Message History</h3>
+        {#if messages.session.length > 0 || (showHistory && messages.history.length > 0)}
+          <h3 class="section-label">Event Log</h3>
         {/if}
         <div class="message-history">
-          {#each messages as message, index}
-            {#if message.type === 'connect' || message.type === 'disconnect'}
+          {#if showHistory}
+            {#each messages.history as message, index}
               <button
-                style:background-color={index === selectedMessageIndex
+                style:color="#999999"
+                style:background-color={selectedMessageRef.log === 'history' &&
+                index === selectedMessageRef?.index
                   ? '#81a1c1'
                   : '#fdfdfe'}
-                on:click={() => handleMessageClick(index)}
-              >
-                {message.type}
-              </button>
-            {:else}
-              <button
-                style:background-color={index === selectedMessageIndex
-                  ? '#81a1c1'
-                  : '#fdfdfe'}
-                on:click={() => handleMessageClick(index)}
+                on:click={() => handleMessageClick('history', index)}
               >
                 {`${message.type} ${message.detail.type}`}
               </button>
-            {/if}
+            {/each}
+          {/if}
+
+          {#each messages.session as message, index}
+            <button
+              style:background-color={selectedMessageRef.log === 'session' &&
+              index === selectedMessageRef?.index
+                ? '#81a1c1'
+                : '#fdfdfe'}
+              on:click={() => handleMessageClick('session', index)}
+            >
+              {`${message.type} ${message.detail.type}`}
+            </button>
           {/each}
         </div>
       </div>
 
       <div class="message-section">
-        {#if messages.length > 0}
-          <h3 class="section-label">Message</h3>
+        {#if messages.session.length > 0 || (showHistory && messages.history.length > 0)}
+          <h3 class="section-label">Event</h3>
         {/if}
         {#if selectedMessage}
           <div class="message-wrapper">
@@ -278,8 +385,19 @@
 
   .connection-status {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr;
     color: #dddde4;
+  }
+
+  .show-history-control {
+    display: grid;
+    grid-auto-flow: column;
+    justify-content: center;
+    gap: 3px;
+  }
+
+  .show-history-control > input {
+    margin: 0 0 3px 0;
   }
 
   .message-controls {
