@@ -20,7 +20,7 @@
     {
       "matches": [
         "https://*/*",
-        "http://localhost:8080/*"
+        "http://localhost/*"
       ],
       "js": ["src/content/page-load.js"]
     }
@@ -28,7 +28,7 @@
   "devtools_page": "src/devtools/devtools.html",
   "host_permissions": [
     "https://*/*",
-    "http://localhost:8080/*"
+    "http://localhost/*"
   ],
   "permissions": [
     "activeTab",

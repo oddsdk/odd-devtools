@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onDestroy } from 'svelte'
   import { JsonView } from '@zerodevx/svelte-json-view'
-  import { connection, eventStore } from './devtools'
+  import { connection, eventStore } from './panel'
 
   let selectedEvent = null
   let selectedEventIndex

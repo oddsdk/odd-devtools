@@ -12,10 +12,19 @@
   "background": {
     "scripts": [ "src/background/background.js" ]
   },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://*/*",
+        "http://localhost/*"
+      ],
+      "js": ["src/content/page-load.js"]
+    }
+  ],
   "devtools_page": "src/devtools/devtools.html",
   "host_permissions": [
     "https://*/*",
-    "<all_urls>"
+    "http://localhost/*"
   ],
   "permissions": [
     "activeTab",
