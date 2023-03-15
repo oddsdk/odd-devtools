@@ -1,4 +1,4 @@
-import { writable } from 'svelte/store'
+import { get as getStore, writable } from 'svelte/store'
 import browser from 'webextension-polyfill'
 
 console.log(`In devtools.js - tabId: ${browser.devtools.inspectedWindow.tabId}`)
@@ -11,12 +11,36 @@ const tabId = browser.devtools.inspectedWindow.tabId
 let backgroundPort = browser.runtime.connect({ name: 'devtools-page' })
 backgroundPort.onMessage.addListener(handleBackgroundMessage)
 
-// Create a panel, and add listeners for panel show/hide events.
+// Create a panel
 browser.devtools.panels.create(
   'Webnative',
   '/webnative16.png',
   '/src/devtools/panel.html'
-)
+).then(panel => {
+  let unsubscribeConnectionStore
+  let unsubscribeEventStore
+
+  panel.onShown.addListener(panelWindow => {
+    panelWindow.initializeStores({
+      connection: getStore(connection),
+      events: getStore(eventStore),
+    })
+
+    unsubscribeEventStore = eventStore.subscribe(store => {
+      panelWindow.updateEvents(store)
+    })
+
+    unsubscribeConnectionStore = connection.subscribe(store => {
+      panelWindow.updateConnection(store)
+    })
+  })
+
+  panel.onHidden.addListener(() => {
+    unsubscribeConnectionStore()
+    unsubscribeEventStore()
+  })
+})
+
 
 // Injet content script
 backgroundPort.postMessage({
@@ -62,10 +86,10 @@ export async function connect() {
   )
 
   if (!connecting) {
-    connection.update(store => ({...store, error: 'DebugModeOff'}))
+    connection.update(store => ({ ...store, error: 'DebugModeOff' }))
   } else if (err) {
-    connection.update(store => ({...store, error: 'EvalFailed'}))
-    console.error('Inspected window eval error: ', err )
+    connection.update(store => ({ ...store, error: 'EvalFailed' }))
+    console.error('Inspected window eval error: ', err)
   }
 }
 
@@ -82,10 +106,10 @@ export async function disconnect() {
   )
 
   if (!disconnecting) {
-    connection.update(store => ({...store, error: 'DebugModeOff'}))
+    connection.update(store => ({ ...store, error: 'DebugModeOff' }))
   } else if (err) {
-    connection.update(store => ({...store, error: 'EvalFailed'}))
-    console.error('Inspected window eval error: ', err )
+    connection.update(store => ({ ...store, error: 'EvalFailed' }))
+    console.error('Inspected window eval error: ', err)
   }
 }
 
