@@ -2,9 +2,8 @@
   import { fade } from 'svelte/transition'
   import { onDestroy } from 'svelte'
   import { JsonView } from '@zerodevx/svelte-json-view'
-
   import * as messageStorage from '../storage/message'
-  import { connection, namespaceStore, messageStore } from './devtools'
+  import { connection, messageStore, namespaceStore } from './panel'
   import { namespaceToString } from '../message'
   import ToggleLeftIcon from './icons/ToggleLeft.svelte'
   import ToggleRightIcon from './icons/ToggleRight.svelte'

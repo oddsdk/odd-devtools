@@ -14,12 +14,43 @@ const tabId = browser.devtools.inspectedWindow.tabId
 let backgroundPort = browser.runtime.connect({ name: 'devtools-page' })
 backgroundPort.onMessage.addListener(handleBackgroundMessage)
 
-// Create a panel, and add listeners for panel show/hide events.
+// Create a panel
 browser.devtools.panels.create(
   'Webnative',
   '/webnative16.png',
   '/src/devtools/panel.html'
-)
+).then(panel => {
+  let unsubscribeConnectionStore
+  let unsubscribeMessageStore
+  let unsubscribeNamespaceStore
+
+  panel.onShown.addListener(panelWindow => {
+    panelWindow.initializeStores({
+      connection: getStore(connection),
+      messages: getStore(messageStore),
+      namespaces: getStore(namespaceStore),
+    })
+
+    unsubscribeMessageStore = messageStore.subscribe(store => {
+      panelWindow.updateEvents(store)
+    })
+
+    unsubscribeConnectionStore = connection.subscribe(store => {
+      panelWindow.updateConnection(store)
+    })
+
+    unsubscribeNamespaceStore = namespaceStore.subscribe(store => {
+      panelWindow.updateNamespaces(store)
+    })
+  })
+
+  panel.onHidden.addListener(() => {
+    unsubscribeConnectionStore()
+    unsubscribeMessageStore()
+    unsubscribeNamespaceStore()
+  })
+})
+
 
 // Injet content script
 backgroundPort.postMessage({

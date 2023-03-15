@@ -2,7 +2,6 @@ import { defineConfig } from 'vite'
 import { resolve } from 'path'
 import { svelte } from '@sveltejs/vite-plugin-svelte'
 import { viteStaticCopy } from 'vite-plugin-static-copy'
-// import manifest from './manifest-firefox.json'
 
 const srcDir = resolve(__dirname, 'src')
 
@@ -10,6 +9,7 @@ const srcDir = resolve(__dirname, 'src')
 export default defineConfig({
   build: {
     emptyOutDir: true,
+    minify: false,
     outDir: resolve(__dirname, 'dist/firefox'),
     rollupOptions: {
       input: {
@@ -34,6 +34,10 @@ export default defineConfig({
         },
         {
           src: 'src/content/content.js',
+          dest: 'src/content',
+        },
+        {
+          src: 'src/content/page-load.js',
           dest: 'src/content',
         }
       ]
