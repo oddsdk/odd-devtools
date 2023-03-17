@@ -9,6 +9,10 @@
     "plugin:@typescript-eslint/recommended",
     "plugin:svelte/recommended"
   ],
+  "ignorePatterns": [
+    "postcss.config.cjs",
+    "tailwind.config.cjs"
+  ],
   "overrides": [
     {
       "files": [
