@@ -56,25 +56,14 @@
         {/if}
         <div class="message-history">
           {#each messages as message, index}
-            {#if message.type === 'connect' || message.type === 'disconnect'}
-              <button
-                style:background-color={index === selectedMessageIndex
-                  ? '#81a1c1'
-                  : '#fdfdfe'}
-                on:click={() => handleMessageClick(index)}
-              >
-                {message.type}
-              </button>
-            {:else}
-              <button
-                style:background-color={index === selectedMessageIndex
-                  ? '#81a1c1'
-                  : '#fdfdfe'}
-                on:click={() => handleMessageClick(index)}
-              >
-                {`${message.type} ${message.detail.type}`}
-              </button>
-            {/if}
+            <button
+              style:background-color={index === selectedMessageIndex
+                ? '#81a1c1'
+                : '#fdfdfe'}
+              on:click={() => handleMessageClick(index)}
+            >
+              {`${message.type} ${message.detail.type}`}
+            </button>
           {/each}
         </div>
       </div>
