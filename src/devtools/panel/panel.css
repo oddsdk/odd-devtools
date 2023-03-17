@@ -1,3 +1,13 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@font-face {
+  font-family: 'Uncut Sans';
+  src: url('/UncutSans-Variable.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'IBM Plex Mono Medium';
+  src: url('/IBMPlexMono-Medium.ttf') format('truetype');
+}
