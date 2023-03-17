@@ -7,27 +7,27 @@ import Panel from '/src/devtools/Panel.svelte'
 
 const tabId = browser.devtools.inspectedWindow.tabId
 
-export const connection = writable({ tabId, connected: false, error: null })
+export const connectionStore = writable({ tabId, connected: false, error: null })
 
-export const eventStore = writable([])
+export const messageStore = writable([])
 
-function initializeStores(event) {
-  connection.set(event.connection)
-  eventStore.set(event.events)
+function initializeStores(data) {
+  connectionStore.set(data.connection)
+  messageStore.set(data.messages)
 }
 
-function updateConnection(event) {
-  connection.set(event)
+function updateConnection(connection) {
+  connectionStore.set(connection)
 }
 
-function updateEvents(event) {
-  eventStore.set(event)
+function updateMessages(messages) {
+  messageStore.set(messages)
 }
 
 // Stores are synced with store state in devtools.js
 window.initializeStores = initializeStores
 window.updateConnection = updateConnection
-window.updateEvents = updateEvents
+window.updateMessages = updateMessages
 
 
 // RENDER PANEL

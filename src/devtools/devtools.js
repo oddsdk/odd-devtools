@@ -18,16 +18,16 @@ browser.devtools.panels.create(
   '/src/devtools/panel.html'
 ).then(panel => {
   let unsubscribeConnectionStore
-  let unsubscribeEventStore
+  let unsubscribeMessageStore
 
   panel.onShown.addListener(panelWindow => {
     panelWindow.initializeStores({
       connection: getStore(connection),
-      events: getStore(eventStore),
+      messages: getStore(messageStore),
     })
 
-    unsubscribeEventStore = eventStore.subscribe(store => {
-      panelWindow.updateEvents(store)
+    unsubscribeMessageStore = messageStore.subscribe(store => {
+      panelWindow.updateMessages(store)
     })
 
     unsubscribeConnectionStore = connection.subscribe(store => {
@@ -37,7 +37,7 @@ browser.devtools.panels.create(
 
   panel.onHidden.addListener(() => {
     unsubscribeConnectionStore()
-    unsubscribeEventStore()
+    unsubscribeMessageStore()
   })
 })
 
@@ -116,29 +116,29 @@ export async function disconnect() {
 
 // MESSAGES
 
-export const eventStore = writable([])
+export const messageStore = writable([])
 
-function handleBackgroundMessage(event) {
-  // console.log('devtools port onMessage', event)
+function handleBackgroundMessage(message) {
+  // console.log('devtools port onMessage', message)
 
-  if (event.type === 'connect') {
-    console.log('received connect message from Webnative', event)
+  if (message.type === 'connect') {
+    console.log('received connect message from Webnative', message)
 
     connection.update(store => ({ ...store, connected: true }))
-  } else if (event.type === 'disconnect') {
-    console.log('received disconnect message from Webnative', event)
+  } else if (message.type === 'disconnect') {
+    console.log('received disconnect message from Webnative', message)
 
     connection.update(store => ({ ...store, connected: false }))
-  } else if (event.type === 'session') {
-    console.log('received session event', event)
+  } else if (message.type === 'session') {
+    console.log('received session message', message)
 
-    eventStore.update(history => [...history, event])
-  } else if (event.type === 'filesystem') {
-    console.log('received filesystem event', event)
+    messageStore.update(history => [...history, message])
+  } else if (message.type === 'filesystem') {
+    console.log('received filesystem message', message)
 
-    eventStore.update(history => [...history, event])
-  } else if (event.type === 'pageload') {
-    console.log('received page load event', event)
+    messageStore.update(history => [...history, message])
+  } else if (message.type === 'pageload') {
+    console.log('received page load message', message)
 
     // Inject content script if missing
     backgroundPort.postMessage({
@@ -148,6 +148,6 @@ function handleBackgroundMessage(event) {
     connect()
 
   } else {
-    console.log('received an unknown message type', event)
+    console.log('received an unknown message type', message)
   }
 }
