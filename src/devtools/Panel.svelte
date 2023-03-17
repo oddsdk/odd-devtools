@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onDestroy } from 'svelte'
   import { JsonView } from '@zerodevx/svelte-json-view'
-  import { connectionStore, messageStore } from './panel'
+  import { connectionStore, messageStore, namespaceStore } from './panel'
 
   let selectedMessage = null
   let selectedMessageIndex
@@ -16,13 +16,20 @@
     }
   })
 
+  const unsubscribeNamespaces = namespaceStore.subscribe(store => {
+    console.log('namespaces', store)
+  })
+
   function handleMessageClick(index) {
     selectedMessage = messages[index]
     selectedMessageIndex = index
     console.log('selected message', selectedMessage)
   }
 
-  onDestroy(unsubscribeMessages)
+  onDestroy(() => {
+    unsubscribeMessages()
+    unsubscribeNamespaces()
+  })
 </script>
 
 <div class="panel-wrapper">

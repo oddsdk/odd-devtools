@@ -1,6 +1,8 @@
 import { get as getStore, writable } from 'svelte/store'
 import browser from 'webextension-polyfill'
 
+import { namespaceToString } from '../message'
+
 console.log(`In devtools.js - tabId: ${browser.devtools.inspectedWindow.tabId}`)
 
 const tabId = browser.devtools.inspectedWindow.tabId
@@ -19,25 +21,32 @@ browser.devtools.panels.create(
 ).then(panel => {
   let unsubscribeConnectionStore
   let unsubscribeMessageStore
+  let unsubscribeNamespaceStore
 
   panel.onShown.addListener(panelWindow => {
     panelWindow.initializeStores({
-      connection: getStore(connection),
+      connection: getStore(connectionStore),
       messages: getStore(messageStore),
+      namespaces: getStore(namespaceStore),
+    })
+
+    unsubscribeConnectionStore = connectionStore.subscribe(store => {
+      panelWindow.updateConnection(store)
     })
 
     unsubscribeMessageStore = messageStore.subscribe(store => {
       panelWindow.updateMessages(store)
     })
 
-    unsubscribeConnectionStore = connection.subscribe(store => {
-      panelWindow.updateConnection(store)
+    unsubscribeNamespaceStore = namespaceStore.subscribe(store => {
+      panelWindow.updateNamespaces(store)
     })
   })
 
   panel.onHidden.addListener(() => {
     unsubscribeConnectionStore()
     unsubscribeMessageStore()
+    unsubscribeNamespaceStore()
   })
 })
 
@@ -71,7 +80,7 @@ chrome.runtime.onConnect.addListener(handleBackgroundConnection)
 
 // WEBNATIVE CONNECTION
 
-export const connection = writable({ tabId, connected: false, error: null })
+export const connectionStore = writable({ tabId, connected: false, error: null })
 
 export async function connect() {
   console.log('connecting to Webnative')
@@ -86,9 +95,9 @@ export async function connect() {
   )
 
   if (!connecting) {
-    connection.update(store => ({ ...store, error: 'DebugModeOff' }))
+    connectionStore.update(store => ({ ...store, error: 'DebugModeOff' }))
   } else if (err) {
-    connection.update(store => ({ ...store, error: 'EvalFailed' }))
+    connectionStore.update(store => ({ ...store, error: 'EvalFailed' }))
     console.error('Inspected window eval error: ', err)
   }
 }
@@ -106,9 +115,9 @@ export async function disconnect() {
   )
 
   if (!disconnecting) {
-    connection.update(store => ({ ...store, error: 'DebugModeOff' }))
+    connectionStore.update(store => ({ ...store, error: 'DebugModeOff' }))
   } else if (err) {
-    connection.update(store => ({ ...store, error: 'EvalFailed' }))
+    connectionStore.update(store => ({ ...store, error: 'EvalFailed' }))
     console.error('Inspected window eval error: ', err)
   }
 }
@@ -117,6 +126,7 @@ export async function disconnect() {
 // MESSAGES
 
 export const messageStore = writable([])
+export const namespaceStore = writable([])
 
 function handleBackgroundMessage(message) {
   // console.log('devtools port onMessage', message)
@@ -124,11 +134,16 @@ function handleBackgroundMessage(message) {
   if (message.type === 'connect') {
     console.log('received connect message from Webnative', message)
 
-    connection.update(store => ({ ...store, connected: true }))
+    const namespace = namespaceToString(message.state.app.namespace)
+    namespaceStore.update(store =>
+      [namespace, ...store.filter(ns => ns !== namespace)]
+    )
+
+    connectionStore.update(store => ({ ...store, connected: true }))
   } else if (message.type === 'disconnect') {
     console.log('received disconnect message from Webnative', message)
 
-    connection.update(store => ({ ...store, connected: false }))
+    connectionStore.update(store => ({ ...store, connected: false }))
   } else if (message.type === 'session') {
     console.log('received session message', message)
 
