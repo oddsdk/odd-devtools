@@ -15,6 +15,7 @@ export const namespaceStore = writable([])
 function initializeStores(data) {
   connectionStore.set(data.connection)
   messageStore.set(data.messages)
+  namespaceStore.set(data.namspaces)
 }
 
 function updateConnection(connection) {

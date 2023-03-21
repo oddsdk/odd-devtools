@@ -7,7 +7,7 @@
 <div class="grid grid-cols-[4fr_1fr] justify-center">
   <div class="flex flex-row gap-2 px-4 py-2 justify-start">
     <WebnativeIcon />
-    <span class="text-xs">Webnative</span>
+    <span class="text-xs font-medium">Webnative</span>
   </div>
   <div class="flex flex-row gap-2 py-2 justify-end">
     <div class="flex flex-row gap-2">

@@ -4,7 +4,7 @@
 
 <div class="grid grid-rows-[19px_31px_auto] divide-y divide-[#4A4C50]">
   <div
-    class="flex flex-col justify-center px-4 py-1 bg-[#262626] text-[9px] uppercase"
+    class="px-4 py-1 bg-[#262626] text-[9px] leading-[11px] font-medium uppercase"
   >
     Events
   </div>

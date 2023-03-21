@@ -134,9 +134,12 @@ function handleBackgroundMessage(message) {
   if (message.type === 'connect') {
     console.log('received connect message from Webnative', message)
 
-    const namespace = namespaceToString(message.state.app.namespace)
+    const namespace = {
+      namespace: namespaceToString(message.state.app.namespace),
+      version: message.state.webnative.version
+    }
     namespaceStore.update(store =>
-      [namespace, ...store.filter(ns => ns !== namespace)]
+      [...store.filter(ns => ns !== namespace), namespace]
     )
 
     connectionStore.update(store => ({ ...store, connected: true }))
