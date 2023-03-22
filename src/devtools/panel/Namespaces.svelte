@@ -15,6 +15,8 @@
     dispatch('change', { namespace: entries[index].namespace })
 
     selectedIndex = index
+
+    console.log('selected index', selectedIndex)
   }
 
   $: {
@@ -28,20 +30,20 @@
 
     // Select the newest namespace when one is added
     // Note that namespaces can only be added, not removed
-    selectedIndex = entries[entries.length - 1]
+    selectedIndex = entries.length - 1
   }
 </script>
 
-<div class="grid grid-rows-[19px_auto]">
+<div class="grid grid-rows-[19px_auto] divide-y divide-[#4A4C50]">
   <div
     class="px-4 py-1 bg-[#262626] text-[9px] leading-[11px] font-medium uppercase"
   >
     Active namespaces
   </div>
-  <div class="divide-y divide-[#4A4C50]">
+  <div>
     {#each entries as entry, index}
       <div
-        class="grid grid-flow-col grid-[1fr_auto] pl-4 pr-2 py-4"
+        class="grid grid-flow-col grid-[1fr_auto] pl-4 pr-2 py-4 border-b border-[#4A4C50]"
         class:bg-white={index === selectedIndex}
         class:text-black={index === selectedIndex}
         on:click={() => selectNamespace(index)}
@@ -55,7 +57,7 @@
               <EllipseOutline />
             {/if}
           </div>
-          <div class="flex flex-col">
+          <div class="flex flex-col leading-[15.5px]">
             <span class:font-bold={index === selectedIndex}>
               {entry.namespace}
             </span>

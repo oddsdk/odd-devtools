@@ -4,7 +4,11 @@ module.exports = {
     './src/devtools/**/*.{html,js,svelte,ts}'
   ],
   theme: {
-    extend: {},
+    extend: {
+      height: {
+        'event-content-height': 'calc(100vh - 72px)',
+      },
+    },
   },
   plugins: [],
 }

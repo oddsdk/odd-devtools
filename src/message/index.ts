@@ -32,6 +32,28 @@ export type AppInfo = {
   creator: string
 }
 
+export function label(message: Message): string {
+  let label
+
+  switch (message.type) {
+    case 'filesystem':
+      if (message.detail.type === 'local-change') {
+        label = 'Local Change'
+      } else {
+        label = 'Publish'
+      }
+      break
+
+    case 'session':
+      if (message.detail.type === 'create') {
+        label = 'Session Create'
+      } else {
+        label = 'Session Destroy'
+      }
+  }
+
+  return label
+}
 
 export function namespaceToString(namespace: AppInfo | string): string {
   return typeof namespace === 'string' ?
