@@ -139,7 +139,7 @@ function handleBackgroundMessage(message) {
       version: message.state.webnative.version
     }
     namespaceStore.update(store =>
-      [...store.filter(ns => ns !== namespace), namespace]
+      [...store.filter(ns => ns.namespace !== namespaceToString(message.state.app.namespace)), namespace]
     )
 
     connectionStore.update(store => ({ ...store, connected: true }))
