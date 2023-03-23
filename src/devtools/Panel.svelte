@@ -36,7 +36,7 @@
 </script>
 
 <div
-  class="h-screen w-screen overflow-y-hidden grid grid-rows-[32px_auto] divide-y divide-[#4A4C50] text-white bg-black"
+  class="h-screen w-screen overflow-y-hidden grid grid-rows-[32px_auto] text-white bg-black"
 >
   <Nav connection={$connectionStore} />
   <div class="grid grid-cols-[1fr_4fr] divide-x divide-[#4A4C50]">
