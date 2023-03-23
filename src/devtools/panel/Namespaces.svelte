@@ -1,15 +1,34 @@
 <script lang="ts">
-  import { createEventDispatcher } from 'svelte'
+  import { createEventDispatcher, onDestroy } from 'svelte'
+
+  import { allNamespace } from '../../namespace'
+  import { namespaceStore } from '../panel'
   import EllipseOutline from './icons/EllipseOutline.svelte'
   import EllipseSolid from './icons/EllipseSolid.svelte'
   import MoreVertical from './icons/MoreVertical.svelte'
-
-  export let namespaces
 
   const dispatch = createEventDispatcher()
 
   let entries = []
   let selectedIndex = 0
+
+  const unsubscribeNamespaces = namespaceStore.subscribe(namespaces => {
+    if (namespaces.length === 0) {
+      entries = []
+    } else if (namespaces.length === 1) {
+      entries = namespaces
+      selectedIndex = 0
+
+      dispatch('change', { namespace: entries[selectedIndex].namespace })
+    } else {
+      entries = [allNamespace, ...namespaces]
+      selectedIndex = entries.length - 1
+
+      // Select the newest namespace when one is added
+      // Note that namespaces can only be added, not removed
+      dispatch('change', { namespace: entries[selectedIndex].namespace })
+    }
+  })
 
   function selectNamespace(index: number) {
     dispatch('change', { namespace: entries[index].namespace })
@@ -19,19 +38,7 @@
     console.log('selected index', selectedIndex)
   }
 
-  $: {
-    const all = { namespace: 'All namespaces', version: null }
-
-    if (namespaces.length > 1) {
-      entries = [all, ...namespaces]
-    } else {
-      entries = namespaces
-    }
-
-    // Select the newest namespace when one is added
-    // Note that namespaces can only be added, not removed
-    selectedIndex = entries.length - 1
-  }
+  onDestroy(unsubscribeNamespaces)
 </script>
 
 <div class="grid grid-rows-[19px_auto] divide-y divide-[#4A4C50]">

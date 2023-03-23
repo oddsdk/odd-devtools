@@ -1,7 +1,7 @@
 import { get as getStore, writable } from 'svelte/store'
 import browser from 'webextension-polyfill'
 
-import { namespaceToString } from '../message'
+import { namespaceToString } from '../namespace'
 
 console.log(`In devtools.js - tabId: ${browser.devtools.inspectedWindow.tabId}`)
 

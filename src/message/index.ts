@@ -1,6 +1,8 @@
+import type { AppInfo } from '../namespace'
 
 export type Message = {
   type: 'session' | 'filesystem'
+  timestamp: number
   state: State
   detail: Detail
 }
@@ -27,11 +29,6 @@ type Detail =
   { type: 'local-change', root: string, path: object } |
   { type: 'publish', root: string }
 
-export type AppInfo = {
-  name: string
-  creator: string
-}
-
 export function label(message: Message): string {
   let label
 
@@ -53,10 +50,4 @@ export function label(message: Message): string {
   }
 
   return label
-}
-
-export function namespaceToString(namespace: AppInfo | string): string {
-  return typeof namespace === 'string' ?
-    namespace :
-    `${namespace.creator}/${namespace.name}`
 }

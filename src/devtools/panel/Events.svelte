@@ -1,24 +1,42 @@
 <script lang="ts">
   import { JsonView } from '@zerodevx/svelte-json-view'
 
-  import { label } from '../../message'
+  import { label, type Message } from '../../message'
   import EllipseOutline from './icons/EllipseOutline.svelte'
   import EllipseSolid from './icons/EllipseSolid.svelte'
   import SearchIcon from './icons/Search.svelte'
 
   export let messages
 
-  let selectedIndex = 0
-  let selectedMessage = null
+  let selectedMessageIndex = 0
+  let selectedMessage: Message
 
   function selectEvent(index: number) {
-    selectedIndex = index
-    selectedMessage = messages[selectedIndex]
+    selectedMessageIndex = index
+    selectedMessage = messages[selectedMessageIndex]
   }
 
   $: {
-    if (messages.length === 1) {
-      selectedMessage = messages[0]
+    if (messages.length === 0) {
+      selectedMessageIndex = null
+      selectedMessage = null
+    } else if (messages.length === 1) {
+      selectedMessageIndex = 0
+      selectedMessage = messages[selectedMessageIndex]
+    } else if (messages.length > 1) {
+      // Find selected message
+      const index = messages.findIndex(
+        message => message.timestamp === selectedMessage?.timestamp
+      )
+
+      // Retain selected message or select the last message
+      if (index > -1) {
+        selectedMessageIndex = index
+        selectedMessage = messages[selectedMessageIndex]
+      } else {
+        selectedMessageIndex = messages.length - 1
+        selectedMessage = messages[selectedMessageIndex]
+      }
     }
   }
 </script>
@@ -38,13 +56,13 @@
       {#each messages as message, index}
         <div
           class="flex flex-row gap-2 px-4 py-2 leading-[15px] border-b border-[#4A4C50]"
-          class:bg-white={index === selectedIndex}
-          class:text-black={index === selectedIndex}
+          class:bg-white={index === selectedMessageIndex}
+          class:text-black={index === selectedMessageIndex}
           on:click={() => selectEvent(index)}
           on:keypress={() => selectEvent(index)}
         >
           <div class="flex flex-col justify-center">
-            {#if index === selectedIndex}
+            {#if index === selectedMessageIndex}
               <EllipseSolid />
             {:else}
               <EllipseOutline />
