@@ -1,13 +1,17 @@
 <script lang="ts">
+  import { createEventDispatcher } from 'svelte'
   import { createFloatingActions } from 'svelte-floating-ui'
   import { offset } from 'svelte-floating-ui/dom'
 
+  import { allNamespace } from '../../namespace'
   import ExternalLink from './icons/ExternalLink.svelte'
   import TrashIcon from './icons/Trash.svelte'
   import MoreVerticalIcon from './icons/MoreVertical.svelte'
   import WebnativeIcon from './icons/Webnative.svelte'
 
   export let connection
+
+  const dispatch = createEventDispatcher()
 
   let showMenu = false
 
@@ -21,6 +25,10 @@
       })
     ]
   })
+
+  function clearMessages() {
+    dispatch('clear', { namespace: allNamespace.namespace })
+  }
 
   function toggleMenu() {
     showMenu = !showMenu
@@ -40,8 +48,12 @@
     </span>
   </div>
   <div class="flex flex-row gap-2 justify-end">
-    <div class="flex flex-row gap-2 py-2">
-      <span class="text-xs">Clear logs</span>
+    <div
+      class="flex flex-row gap-2 py-2 cursor-pointer"
+      on:click={clearMessages}
+      on:keypress={clearMessages}
+    >
+      <span class="text-xs whitespace-nowrap">Clear logs</span>
       <TrashIcon />
     </div>
     <div
@@ -62,7 +74,7 @@
     use:floatingContent
   >
     <a
-      class="flex flex-row gap-2 py-2 px-4 whitespace-nowrap"
+      class="flex flex-row gap-2 py-2 px-4"
       href="https://guide.fission.codes/developers/webnative"
       target="_blank"
       rel="noreferrer"
@@ -71,7 +83,7 @@
       <ExternalLink />
     </a>
     <a
-      class="flex flex-row gap-2 py-2 px-4 whitespace-nowrap"
+      class="flex flex-row gap-2 py-2 px-4"
       href="https://github.com/webnative-examples/webnative-devtools"
       target="_blank"
       rel="noreferrer"

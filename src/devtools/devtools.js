@@ -1,7 +1,7 @@
 import { get as getStore, writable } from 'svelte/store'
 import browser from 'webextension-polyfill'
 
-import { namespaceToString } from '../namespace'
+import { allNamespace, namespaceToString } from '../namespace'
 
 console.log(`In devtools.js - tabId: ${browser.devtools.inspectedWindow.tabId}`)
 
@@ -28,6 +28,14 @@ browser.devtools.panels.create(
       connection: getStore(connectionStore),
       messages: getStore(messageStore),
       namespaces: getStore(namespaceStore),
+
+      clearMessages: (namespace) => {
+        if (namespace === allNamespace.namespace ) {
+          messageStore.set([])
+        } else {
+          // clear by namespace
+        }
+      }
     })
 
     unsubscribeConnectionStore = connectionStore.subscribe(store => {

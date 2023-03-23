@@ -4,7 +4,11 @@
   import type { Message } from '../message'
 
   import './panel/panel.css'
-  import { connectionStore, messageStore } from './panel'
+  import {
+    clearMessages as clear,
+    connectionStore,
+    messageStore
+  } from './panel'
   import { allNamespace, namespaceToString } from '../namespace'
   import Events from './panel/Events.svelte'
   import Namespaces from './panel/Namespaces.svelte'
@@ -32,13 +36,19 @@
     )
   }
 
+  function clearMessages(event) {
+    const { namespace } = event.detail.namespace
+
+    clear(namespace)
+  }
+
   onDestroy(unsubscribeMessages)
 </script>
 
 <div
   class="h-screen w-screen overflow-y-hidden grid grid-rows-[32px_auto] text-white bg-black"
 >
-  <Nav connection={$connectionStore} />
+  <Nav connection={$connectionStore} on:clear={clearMessages} />
   <div class="grid grid-cols-[1fr_4fr] divide-x divide-[#4A4C50]">
     <Namespaces on:change={handleNamespaceChange} />
     <Events messages={filteredMessages} />

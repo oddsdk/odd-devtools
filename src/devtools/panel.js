@@ -11,11 +11,14 @@ export const connectionStore = writable({ tabId, connected: false, error: null }
 
 export const messageStore = writable([])
 export const namespaceStore = writable([])
+export let clearMessages
 
 function initializeStores(data) {
   connectionStore.set(data.connection)
   messageStore.set(data.messages)
   namespaceStore.set(data.namespaces)
+
+  clearMessages = data.clearMessages
 }
 
 function updateConnection(connection) {
