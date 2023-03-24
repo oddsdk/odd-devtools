@@ -8,9 +8,10 @@ import Panel from '/src/devtools/Panel.svelte'
 const tabId = browser.devtools.inspectedWindow.tabId
 
 export const connectionStore = writable({ tabId, connected: false, error: null })
-
 export const messageStore = writable([])
 export const namespaceStore = writable([])
+export const selectedMessageStore = writable(null)
+
 export let clearMessages
 
 function initializeStores(data) {

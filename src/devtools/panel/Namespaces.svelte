@@ -1,41 +1,86 @@
 <script lang="ts">
   import { createEventDispatcher, onDestroy } from 'svelte'
 
-  import { allNamespace } from '../../namespace'
-  import { namespaceStore } from '../panel'
-  import EllipseOutline from './icons/EllipseOutline.svelte'
-  import EllipseSolid from './icons/EllipseSolid.svelte'
-  import MoreVertical from './icons/MoreVertical.svelte'
+  import { allNamespace, namespaceToString } from '../../namespace'
+  import { namespaceStore, selectedMessageStore } from '../panel'
+  import Namespace from './namespace/Namespace.svelte'
+
+  export let messages
 
   const dispatch = createEventDispatcher()
 
-  let entries = []
-  let selectedIndex = 0
+  let namespaces = []
+  let selectedNamespace = null
+  let selectedNamespaceIndex = 0
+  let selectedMenuIndex = null
 
-  const unsubscribeNamespaces = namespaceStore.subscribe(namespaces => {
-    if (namespaces.length === 0) {
-      entries = []
-    } else if (namespaces.length === 1) {
-      entries = namespaces
-      selectedIndex = 0
+  const unsubscribeNamespaces = namespaceStore.subscribe(store => {
+    if (store.length === 0) {
+      namespaces = []
+    } else if (store.length === 1) {
+      namespaces = store
+      selectedNamespaceIndex = 0
+      selectedNamespace = store[selectedNamespaceIndex]
 
-      dispatch('change', { namespace: entries[selectedIndex].namespace })
+      dispatch('change', {
+        namespace: namespaces[selectedNamespaceIndex].namespace
+      })
     } else {
-      entries = [allNamespace, ...namespaces]
-      selectedIndex = entries.length - 1
+      namespaces = [allNamespace, ...store]
+      selectedNamespaceIndex = namespaces.length - 1
+      selectedNamespace = store[selectedNamespaceIndex]
 
-      // Select the newest namespace when one is added
-      // Note that namespaces can only be added, not removed
-      dispatch('change', { namespace: entries[selectedIndex].namespace })
+      // Select the newest namespace when one is added.
+      // Note that namespaces can only be added, not removed.
+      dispatch('change', {
+        namespace: namespaces[selectedNamespaceIndex].namespace
+      })
     }
   })
 
-  function selectNamespace(index: number) {
-    dispatch('change', { namespace: entries[index].namespace })
+  function selectNamespace(event: CustomEvent<{ index: number }>) {
+    const { index } = event.detail
 
-    selectedIndex = index
+    selectedNamespaceIndex = index
+    selectedNamespace = namespaces[selectedNamespaceIndex]
 
-    console.log('selected index', selectedIndex)
+    // Close menus when a namespace is selected
+    selectedMenuIndex = null
+
+    dispatch('change', { namespace: namespaces[index].namespace })
+  }
+
+  function selectMenu(event: CustomEvent<{ index: number }>) {
+    const { index } = event.detail
+
+    selectedMenuIndex = index
+  }
+
+  function selectLastMessage(event: CustomEvent<{ namespace: string }>) {
+    const { namespace } = event.detail
+
+    if (selectedMenuIndex === selectedNamespaceIndex) {
+      // Namespace matching message is selected. Set message.
+      selectedMessageStore.set(messages.length > 0 ? messages.length - 1 : null)
+    } else if (selectedNamespace === allNamespace) {
+      const index = messages.findLastIndex(
+        message => namespaceToString(message.state.app.namespace) === namespace
+      )
+
+      // Set message or switch to message namespace to indicate
+      // no matching message exists.
+      if (index > -1) {
+        selectedMessageStore.set(index)
+      } else {
+        selectedNamespaceIndex = selectedMenuIndex
+        dispatch('change', { namespace })
+      }
+    } else {
+      // Select matching namespace. Namespace selection automatically
+      // selects the last message.
+      selectedNamespaceIndex = selectedMenuIndex
+      dispatch('change', { namespace })
+    }
   }
 
   onDestroy(unsubscribeNamespaces)
@@ -48,41 +93,17 @@
     Active namespaces
   </div>
   <div>
-    {#each entries as entry, index}
-      <div
-        class="grid grid-flow-col grid-[1fr_auto] pl-4 pr-2 py-4 border-b border-[#4A4C50]"
-        class:bg-white={index === selectedIndex}
-        class:text-black={index === selectedIndex}
-        on:click={() => selectNamespace(index)}
-        on:keypress={() => selectNamespace(index)}
-      >
-        <div class="flex flex-row gap-2">
-          <div class="flex flex-col justify-center">
-            {#if index === selectedIndex}
-              <EllipseSolid />
-            {:else}
-              <EllipseOutline />
-            {/if}
-          </div>
-          <div class="flex flex-col leading-[15.5px]">
-            <span class:font-bold={index === selectedIndex}>
-              {entry.namespace}
-            </span>
-            <span>
-              {#if entry.version}
-                {entry.version}
-              {:else}
-                Show all events
-              {/if}
-            </span>
-          </div>
-        </div>
-        {#if entry.namespace !== 'All namespaces'}
-          <div class="grid grid-flow-row justify-end items-center">
-            <MoreVertical />
-          </div>
-        {/if}
-      </div>
+    {#each namespaces as namespace, index}
+      <Namespace
+        {index}
+        {namespace}
+        {selectedMenuIndex}
+        {selectedNamespaceIndex}
+        on:select={selectNamespace}
+        on:selectmenu={selectMenu}
+        on:selectlastmessage={selectLastMessage}
+        on:clear
+      />
     {/each}
   </div>
 </div>

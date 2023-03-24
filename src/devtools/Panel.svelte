@@ -10,7 +10,7 @@
     messageStore
   } from './panel'
   import { allNamespace, namespaceToString } from '../namespace'
-  import Events from './panel/Events.svelte'
+  import Messages from './panel/Messages.svelte'
   import Namespaces from './panel/Namespaces.svelte'
   import Nav from './panel/Nav.svelte'
 
@@ -28,18 +28,19 @@
     selectedNamespace = namespace
   }
 
+  function clearMessages(event: CustomEvent<{ namespace: string }>) {
+    const { namespace } = event.detail
+
+    console.log('event', namespace)
+    clear(namespace)
+  }
+
   $: {
     filteredMessages = messages.filter(message =>
       selectedNamespace === allNamespace.namespace
         ? true
         : namespaceToString(message.state.app.namespace) === selectedNamespace
     )
-  }
-
-  function clearMessages(event) {
-    const { namespace } = event.detail.namespace
-
-    clear(namespace)
   }
 
   onDestroy(unsubscribeMessages)
@@ -50,7 +51,11 @@
 >
   <Nav connection={$connectionStore} on:clear={clearMessages} />
   <div class="grid grid-cols-[1fr_4fr] divide-x divide-[#4A4C50]">
-    <Namespaces on:change={handleNamespaceChange} />
-    <Events messages={filteredMessages} />
+    <Namespaces
+      messages={filteredMessages}
+      on:change={handleNamespaceChange}
+      on:clear={clearMessages}
+    />
+    <Messages messages={filteredMessages} />
   </div>
 </div>

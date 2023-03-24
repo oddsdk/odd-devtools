@@ -30,10 +30,12 @@ browser.devtools.panels.create(
       namespaces: getStore(namespaceStore),
 
       clearMessages: (namespace) => {
-        if (namespace === allNamespace.namespace ) {
+        if (namespace === allNamespace.namespace) {
           messageStore.set([])
         } else {
-          // clear by namespace
+          messageStore.update(messages =>
+            messages.filter(message => namespaceToString(message.state.app.namespace) !== namespace)
+          )
         }
       }
     })

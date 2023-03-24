@@ -1,7 +1,9 @@
 <script lang="ts">
   import { JsonView } from '@zerodevx/svelte-json-view'
+  import { onDestroy } from 'svelte'
 
   import { label, type Message } from '../../message'
+  import { selectedMessageStore } from '../panel'
   import EllipseOutline from './icons/EllipseOutline.svelte'
   import EllipseSolid from './icons/EllipseSolid.svelte'
   import SearchIcon from './icons/Search.svelte'
@@ -11,7 +13,14 @@
   let selectedMessageIndex = 0
   let selectedMessage: Message
 
-  function selectEvent(index: number) {
+  const unsubscribeSelecteMessageStore = selectedMessageStore.subscribe(
+    selected => {
+      selectedMessageIndex = selected
+      selectedMessage = messages[selectedMessageIndex]
+    }
+  )
+
+  function selectMessage(index: number) {
     selectedMessageIndex = index
     selectedMessage = messages[selectedMessageIndex]
   }
@@ -38,7 +47,11 @@
         selectedMessage = messages[selectedMessageIndex]
       }
     }
+
+    selectedMessageStore.set(selectedMessageIndex)
   }
+
+  onDestroy(unsubscribeSelecteMessageStore)
 </script>
 
 <div class="grid grid-rows-[19px_32px_auto] divide-y divide-[#4A4C50]">
@@ -58,8 +71,8 @@
           class="flex flex-row gap-2 px-4 py-2 leading-[15px] border-b border-[#4A4C50]"
           class:bg-white={index === selectedMessageIndex}
           class:text-black={index === selectedMessageIndex}
-          on:click={() => selectEvent(index)}
-          on:keypress={() => selectEvent(index)}
+          on:click={() => selectMessage(index)}
+          on:keypress={() => selectMessage(index)}
         >
           <div class="flex flex-col justify-center">
             {#if index === selectedMessageIndex}
