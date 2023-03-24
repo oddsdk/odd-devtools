@@ -14,6 +14,10 @@
 
   let showMenu = false
 
+  function select() {
+    dispatch('select', { index })
+  }
+
   function openMenu() {
     showMenu = true
     dispatch('selectmenu', { index })
@@ -21,10 +25,6 @@
 
   function closeMenu() {
     showMenu = false
-  }
-
-  function select() {
-    dispatch('select', { index })
   }
 
   function clearMessages() {
@@ -45,7 +45,7 @@
 </script>
 
 <div
-  class="grid grid-flow-col grid-[1fr_auto] relative pl-4 pr-2 py-4 border-b border-[#4A4C50]"
+  class="grid grid-flow-col grid-cols-[1fr_16px] relative pl-4 pr-2 py-4 border-b border-[#4A4C50] cursor-pointer"
   class:bg-white={index === selectedNamespaceIndex}
   class:text-black={index === selectedNamespaceIndex}
   on:click={select}

@@ -68,7 +68,7 @@
     <div class="pb-4 h-event-content-height overflow-y-auto">
       {#each messages as message, index}
         <div
-          class="flex flex-row gap-2 px-4 py-2 leading-[15px] border-b border-[#4A4C50]"
+          class="flex flex-row gap-2 px-4 py-2 leading-[15px] border-b border-[#4A4C50] cursor-pointer"
           class:bg-white={index === selectedMessageIndex}
           class:text-black={index === selectedMessageIndex}
           on:click={() => selectMessage(index)}
