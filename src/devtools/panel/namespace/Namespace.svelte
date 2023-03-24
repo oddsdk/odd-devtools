@@ -65,7 +65,7 @@
       </span>
       <span>
         {#if namespace.version}
-          {namespace.version}
+          v{namespace.version}
         {:else}
           Show all events
         {/if}
