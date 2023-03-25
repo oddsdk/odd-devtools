@@ -86,9 +86,9 @@
   onDestroy(unsubscribeNamespaces)
 </script>
 
-<div class="grid grid-rows-[19px_auto] divide-y divide-[#4A4C50]">
+<div class="grid grid-rows-[19px_auto] divide-y divide-gray">
   <div
-    class="px-4 py-1 bg-[#262626] text-[9px] leading-[11px] font-medium uppercase"
+    class="px-4 py-1 bg-gray-dark text-[9px] leading-[11px] font-medium uppercase"
   >
     Active namespaces
   </div>

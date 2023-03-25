@@ -50,7 +50,7 @@
   class="h-screen w-screen overflow-y-hidden grid grid-rows-[32px_auto] text-white bg-black"
 >
   <Nav connection={$connectionStore} on:clear={clearMessages} />
-  <div class="grid grid-cols-[1fr_4fr] divide-x divide-[#4A4C50]">
+  <div class="grid grid-cols-[1fr_4fr] divide-x divide-gray">
     <Namespaces
       messages={filteredMessages}
       on:change={handleNamespaceChange}
