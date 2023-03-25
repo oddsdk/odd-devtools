@@ -10,6 +10,7 @@ const tabId = browser.devtools.inspectedWindow.tabId
 export const connectionStore = writable({ tabId, connected: false, error: null })
 export const messageStore = writable([])
 export const namespaceStore = writable([])
+export const searchTermStore = writable('')
 export const selectedMessageStore = writable(null)
 
 export let clearMessages

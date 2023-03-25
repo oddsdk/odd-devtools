@@ -1,15 +1,15 @@
 <script lang="ts">
   import { onDestroy } from 'svelte'
 
-  import type { Message } from '../message'
-
   import './panel/panel.css'
   import {
     clearMessages as clear,
     connectionStore,
-    messageStore
+    messageStore,
+    searchTermStore
   } from './panel'
   import { allNamespace, namespaceToString } from '../namespace'
+  import { hasMatchingTerm, type Message } from '../message'
   import Messages from './panel/Messages.svelte'
   import Namespaces from './panel/Namespaces.svelte'
   import Nav from './panel/Nav.svelte'
@@ -31,16 +31,22 @@
   function clearMessages(event: CustomEvent<{ namespace: string }>) {
     const { namespace } = event.detail
 
-    console.log('event', namespace)
     clear(namespace)
   }
 
   $: {
-    filteredMessages = messages.filter(message =>
-      selectedNamespace === allNamespace.namespace
-        ? true
-        : namespaceToString(message.state.app.namespace) === selectedNamespace
-    )
+    filteredMessages = messages
+      .filter(message =>
+        selectedNamespace === allNamespace.namespace
+          ? true
+          : namespaceToString(message.state.app.namespace) === selectedNamespace
+      )
+      .filter(message =>
+        hasMatchingTerm(
+          { detail: message.detail, state: message.state },
+          $searchTermStore
+        )
+      )
   }
 
   onDestroy(unsubscribeMessages)

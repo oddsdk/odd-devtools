@@ -51,3 +51,21 @@ export function label(message: Message): string {
 
   return label
 }
+
+export function hasMatchingTerm(collection: object | [], term: string): boolean {
+  const vals = Array.isArray(collection)
+    ? collection
+    : Object.values(collection)
+
+  return vals.some(val => {
+    if (typeof val === 'string') {
+      return val.includes(term)
+    } else if (typeof val === 'number' || val === null) {
+      return String(val).includes(term)
+    } else if (typeof val === 'object' || Array.isArray(val)) {
+      return hasMatchingTerm(val, term)
+    } else {
+      return false
+    }
+  })
+}

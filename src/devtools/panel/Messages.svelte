@@ -1,12 +1,13 @@
 <script lang="ts">
-  import { JsonView } from '@zerodevx/svelte-json-view'
   import { onDestroy } from 'svelte'
+  import { JsonView } from '@zerodevx/svelte-json-view'
 
   import { label, type Message } from '../../message'
-  import { selectedMessageStore } from '../panel'
+  import { searchTermStore, selectedMessageStore } from '../panel'
   import EllipseOutline from './icons/EllipseOutline.svelte'
   import EllipseSolid from './icons/EllipseSolid.svelte'
   import SearchIcon from './icons/Search.svelte'
+  import XIcon from './icons/X.svelte'
 
   export let messages
 
@@ -23,6 +24,14 @@
   function selectMessage(index: number) {
     selectedMessageIndex = index
     selectedMessage = messages[selectedMessageIndex]
+  }
+
+  function setSearchTerm(event: { currentTarget: HTMLInputElement }) {
+    searchTermStore.set(event.currentTarget.value)
+  }
+
+  function clearSearchTerm() {
+    searchTermStore.set('')
   }
 
   /**
@@ -67,8 +76,25 @@
     Events
   </div>
   <div class="flex flex-row gap-2 justify-start items-center px-4 py-2">
-    <SearchIcon />
-    <span class="text-xs text-gray-light">Filter events...</span>
+    {#if $searchTermStore.length === 0}
+      <SearchIcon />
+    {:else}
+      <span
+        class="translate-y-px cursor-pointer"
+        on:click={clearSearchTerm}
+        on:keypress={clearSearchTerm}
+      >
+        <XIcon />
+      </span>
+    {/if}
+    <input
+      class="w-full bg-black text-xs text-gray-light outline-none"
+      type="text"
+      placeholder="Filter events..."
+      spellcheck="false"
+      bind:value={$searchTermStore}
+      on:input={setSearchTerm}
+    />
   </div>
   <div class="grid grid-cols-[1fr_3fr] divide-x divide-gray">
     <div class="pb-4 h-event-content-height overflow-y-auto">
