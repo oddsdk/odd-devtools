@@ -19,6 +19,8 @@
       namespaces = []
     } else if (store.length === 1) {
       namespaces = store
+
+      // Select the only namespace
       selectedNamespaceIndex = 0
       selectedNamespace = store[selectedNamespaceIndex]
 
@@ -27,11 +29,12 @@
       })
     } else {
       namespaces = [allNamespace, ...store]
+
+      // Select the newest namespace when one is added.
+      // Namespaces can only be added, not removed.
       selectedNamespaceIndex = namespaces.length - 1
       selectedNamespace = store[selectedNamespaceIndex]
 
-      // Select the newest namespace when one is added.
-      // Note that namespaces can only be added, not removed.
       dispatch('change', {
         namespace: namespaces[selectedNamespaceIndex].namespace
       })
@@ -44,7 +47,7 @@
     selectedNamespaceIndex = index
     selectedNamespace = namespaces[selectedNamespaceIndex]
 
-    // Close menus when a namespace is selected
+    // Close all menus when a namespace is selected
     selectedMenuIndex = null
 
     dispatch('change', { namespace: namespaces[index].namespace })
@@ -56,18 +59,24 @@
     selectedMenuIndex = index
   }
 
+  /**
+   * Select the last message or set message to null in selected menu namespace
+   *
+   * @param event.namespace Target namespace matching menu where event originated
+   */
   function selectLastMessage(event: CustomEvent<{ namespace: string }>) {
     const { namespace } = event.detail
 
     if (selectedMenuIndex === selectedNamespaceIndex) {
-      // Namespace matching message is selected. Set message.
+      // Menu namespace and selected namespace match. Set to last message.
       selectedMessageStore.set(messages.length > 0 ? messages.length - 1 : null)
     } else if (selectedNamespace === allNamespace) {
+      // All namespaces is selected
       const index = messages.findLastIndex(
         message => namespaceToString(message.state.app.namespace) === namespace
       )
 
-      // Set message or switch to message namespace to indicate
+      // Set to last message or switch to message namespace to indicate
       // no matching message exists.
       if (index > -1) {
         selectedMessageStore.set(index)
@@ -76,8 +85,8 @@
         dispatch('change', { namespace })
       }
     } else {
-      // Select matching namespace. Namespace selection automatically
-      // selects the last message.
+      // Set to namespace to menu namepsace.
+      // Namespace selection automatically selects the last message if it exists.
       selectedNamespaceIndex = selectedMenuIndex
       dispatch('change', { namespace })
     }

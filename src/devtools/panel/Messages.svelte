@@ -25,15 +25,21 @@
     selectedMessage = messages[selectedMessageIndex]
   }
 
+  /**
+   * Listen for changes to filtered messages.
+   * Update reference to selected message or select the last
+   * message if selected message is missing.
+   */
   $: {
     if (messages.length === 0) {
       selectedMessageIndex = null
       selectedMessage = null
     } else if (messages.length === 1) {
+      // Select the only message
       selectedMessageIndex = 0
       selectedMessage = messages[selectedMessageIndex]
     } else if (messages.length > 1) {
-      // Find selected message
+      // Find selected message index
       const index = messages.findIndex(
         message => message.timestamp === selectedMessage?.timestamp
       )
