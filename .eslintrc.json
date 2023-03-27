@@ -9,6 +9,10 @@
     "plugin:@typescript-eslint/recommended",
     "plugin:svelte/recommended"
   ],
+  "ignorePatterns": [
+    "postcss.config.cjs",
+    "tailwind.config.cjs"
+  ],
   "overrides": [
     {
       "files": [
@@ -33,7 +37,8 @@
   "rules": {
     "indent": [
       "error",
-      2
+      2,
+      { "SwitchCase": 1 }
     ],
     "linebreak-style": [
       "error",

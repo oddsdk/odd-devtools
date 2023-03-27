@@ -1,187 +1,67 @@
 <script lang="ts">
   import { onDestroy } from 'svelte'
-  import { JsonView } from '@zerodevx/svelte-json-view'
-  import { connection, eventStore } from './panel'
 
-  let selectedEvent = null
-  let selectedEventIndex
-  let events = []
+  import './panel/panel.css'
+  import {
+    clearMessages as clear,
+    connectionStore,
+    messageStore,
+    searchTermStore
+  } from './panel'
+  import { allNamespace, namespaceToString } from '../namespace'
+  import { hasMatchingTerm, type Message } from '../message'
+  import Messages from './panel/Messages.svelte'
+  import Namespaces from './panel/Namespaces.svelte'
+  import Nav from './panel/Nav.svelte'
 
-  const unsubscribeEvents = eventStore.subscribe(store => {
-    events = store
+  let messages: Message[] = []
+  let filteredMessages = []
+  let selectedNamespace
 
-    if (events.length === 1) {
-      selectedEvent = events[0]
-      selectedEventIndex = 0
-    }
+  const unsubscribeMessages = messageStore.subscribe(store => {
+    messages = store
   })
 
-  function handleEventClick(index) {
-    selectedEvent = events[index]
-    selectedEventIndex = index
-    console.log('selected event', selectedEvent)
+  function handleNamespaceChange(event: CustomEvent<{ namespace: string }>) {
+    const { namespace } = event.detail
+
+    selectedNamespace = namespace
   }
 
-  onDestroy(unsubscribeEvents)
+  function clearMessages(event: CustomEvent<{ namespace: string }>) {
+    const { namespace } = event.detail
+
+    clear(namespace)
+  }
+
+  $: {
+    filteredMessages = messages
+      .filter(message =>
+        selectedNamespace === allNamespace.namespace
+          ? true
+          : namespaceToString(message.state.app.namespace) === selectedNamespace
+      )
+      .filter(message =>
+        hasMatchingTerm(
+          { detail: message.detail, state: message.state },
+          $searchTermStore
+        )
+      )
+  }
+
+  onDestroy(unsubscribeMessages)
 </script>
 
-<div class="panel-wrapper">
-  {#if $connection.error === 'DebugModeOff'}
-    <div class="connection-error">
-      Please make sure Webnative debug mode is set to true. See the
-      <a
-        href="https://guide.fission.codes/developers/webnative/initialization#configuration"
-        target="_blank"
-        rel="noreferrer"
-        style="color: #fefefe"
-      >
-        Webnative configuration guide
-      </a>
-      for instructions on enabling debug mode.
-    </div>
-  {:else}
-    <div class="connection-status">
-      {#if $connection.connected}
-        <div>Connected to Webnative</div>
-        {#if events.length === 0}
-          <div class="no-messages">No messages received yet</div>
-        {/if}
-      {/if}
-    </div>
-
-    <div class="wrapper">
-      <div>
-        {#if events.length > 0}
-          <h3 class="section-label">Event History</h3>
-        {/if}
-        <div class="event-history">
-          {#each events as event, index}
-            {#if event.type === 'connect' || event.type === 'disconnect'}
-              <button
-                style:background-color={index === selectedEventIndex
-                  ? '#81a1c1'
-                  : '#fdfdfe'}
-                on:click={() => handleEventClick(index)}
-              >
-                {event.type}
-              </button>
-            {:else}
-              <button
-                style:background-color={index === selectedEventIndex
-                  ? '#81a1c1'
-                  : '#fdfdfe'}
-                on:click={() => handleEventClick(index)}
-              >
-                {`${event.type} ${event.detail.type}`}
-              </button>
-            {/if}
-          {/each}
-        </div>
-      </div>
-
-      <div class="event-section">
-        {#if events.length > 0}
-          <h3 class="section-label">Event</h3>
-        {/if}
-        {#if selectedEvent}
-          <div class="event-wrapper">
-            {#if selectedEvent.detail}
-              <h4 class="section-label">Detail</h4>
-              <div class="jsonview-wrapper">
-                <JsonView json={selectedEvent.detail} />
-              </div>
-            {/if}
-            <h4 class="section-label">State</h4>
-            <div class="jsonview-wrapper">
-              <JsonView json={selectedEvent.state} />
-            </div>
-          </div>
-        {/if}
-      </div>
-    </div>
-  {/if}
+<div
+  class="h-screen w-screen overflow-y-hidden grid grid-rows-[32px_auto] text-white bg-black"
+>
+  <Nav connection={$connectionStore} on:clear={clearMessages} />
+  <div class="grid grid-cols-[1fr_4fr] divide-x divide-gray">
+    <Namespaces
+      messages={filteredMessages}
+      on:change={handleNamespaceChange}
+      on:clear={clearMessages}
+    />
+    <Messages messages={filteredMessages} />
+  </div>
 </div>
-
-<style>
-  .panel-wrapper {
-    display: grid;
-    grid-template-rows: auto 1fr;
-    gap: 8px;
-    width: calc(100vw - 16px);
-    height: calc(100vh - 32px);
-    padding: 8px;
-    overflow-y: auto;
-
-    background-color: #1e1e1e;
-    color: #fdfdfe;
-    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS',
-      sans-serif;
-  }
-
-  .wrapper {
-    display: grid;
-    grid-template-columns: minmax(min-content, 15vw) 80vw;
-    grid-auto-flow: column;
-    gap: 10px;
-  }
-
-  .event-section {
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .event-wrapper {
-    height: 100%;
-    padding: 4px;
-    background-color: #fdfdfe;
-    color: #333333;
-    border: 1px solid transparent;
-    border-radius: 3px;
-    overflow: auto;
-  }
-
-  .event-history {
-    display: grid;
-    grid-template-columns: masonry;
-    gap: 2px;
-  }
-
-  .section-label {
-    margin: 2px 0 4px 2px;
-    white-space: nowrap;
-  }
-
-  .connection-status {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    color: #dddde4;
-  }
-
-  .no-messages {
-    display: grid;
-    justify-content: end;
-  }
-
-  .connection-error {
-    display: inline-block;
-    color: #fefefe;
-    font-size: 14px;
-    margin-top: 10px;
-  }
-
-  .jsonview-wrapper {
-    font-family: monospace;
-    font-size: 10px;
-    --jsonBorderLeft: 1px solid #81a1c1;
-    --jsonValStringColor: #5e81ac;
-    --jsonValColor: #bf616a;
-    --jsonBracketHoverBackground: #e5e9f0;
-  }
-
-  button {
-    background-color: #fefefe;
-    border: 1px solid transparent;
-    border-radius: 3px;
-  }
-</style>

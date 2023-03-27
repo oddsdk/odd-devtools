@@ -1,6 +1,8 @@
 import { get as getStore, writable } from 'svelte/store'
 import browser from 'webextension-polyfill'
 
+import { allNamespace, namespaceToString } from '../namespace'
+
 console.log(`In devtools.js - tabId: ${browser.devtools.inspectedWindow.tabId}`)
 
 const tabId = browser.devtools.inspectedWindow.tabId
@@ -18,26 +20,43 @@ browser.devtools.panels.create(
   '/src/devtools/panel.html'
 ).then(panel => {
   let unsubscribeConnectionStore
-  let unsubscribeEventStore
+  let unsubscribeMessageStore
+  let unsubscribeNamespaceStore
 
   panel.onShown.addListener(panelWindow => {
     panelWindow.initializeStores({
-      connection: getStore(connection),
-      events: getStore(eventStore),
+      connection: getStore(connectionStore),
+      messages: getStore(messageStore),
+      namespaces: getStore(namespaceStore),
+
+      clearMessages: (namespace) => {
+        if (namespace === allNamespace.namespace) {
+          messageStore.set([])
+        } else {
+          messageStore.update(messages =>
+            messages.filter(message => namespaceToString(message.state.app.namespace) !== namespace)
+          )
+        }
+      }
     })
 
-    unsubscribeEventStore = eventStore.subscribe(store => {
-      panelWindow.updateEvents(store)
-    })
-
-    unsubscribeConnectionStore = connection.subscribe(store => {
+    unsubscribeConnectionStore = connectionStore.subscribe(store => {
       panelWindow.updateConnection(store)
+    })
+
+    unsubscribeMessageStore = messageStore.subscribe(store => {
+      panelWindow.updateMessages(store)
+    })
+
+    unsubscribeNamespaceStore = namespaceStore.subscribe(store => {
+      panelWindow.updateNamespaces(store)
     })
   })
 
   panel.onHidden.addListener(() => {
     unsubscribeConnectionStore()
-    unsubscribeEventStore()
+    unsubscribeMessageStore()
+    unsubscribeNamespaceStore()
   })
 })
 
@@ -71,7 +90,7 @@ chrome.runtime.onConnect.addListener(handleBackgroundConnection)
 
 // WEBNATIVE CONNECTION
 
-export const connection = writable({ tabId, connected: false, error: null })
+export const connectionStore = writable({ tabId, connected: false, error: null })
 
 export async function connect() {
   console.log('connecting to Webnative')
@@ -86,9 +105,9 @@ export async function connect() {
   )
 
   if (!connecting) {
-    connection.update(store => ({ ...store, error: 'DebugModeOff' }))
+    connectionStore.update(store => ({ ...store, error: 'DebugModeOff' }))
   } else if (err) {
-    connection.update(store => ({ ...store, error: 'EvalFailed' }))
+    connectionStore.update(store => ({ ...store, error: 'EvalFailed' }))
     console.error('Inspected window eval error: ', err)
   }
 }
@@ -106,9 +125,9 @@ export async function disconnect() {
   )
 
   if (!disconnecting) {
-    connection.update(store => ({ ...store, error: 'DebugModeOff' }))
+    connectionStore.update(store => ({ ...store, error: 'DebugModeOff' }))
   } else if (err) {
-    connection.update(store => ({ ...store, error: 'EvalFailed' }))
+    connectionStore.update(store => ({ ...store, error: 'EvalFailed' }))
     console.error('Inspected window eval error: ', err)
   }
 }
@@ -116,29 +135,38 @@ export async function disconnect() {
 
 // MESSAGES
 
-export const eventStore = writable([])
+export const messageStore = writable([])
+export const namespaceStore = writable([])
 
-function handleBackgroundMessage(event) {
-  // console.log('devtools port onMessage', event)
+function handleBackgroundMessage(message) {
+  // console.log('devtools port onMessage', message)
 
-  if (event.type === 'connect') {
-    console.log('received connect message from Webnative', event)
+  if (message.type === 'connect') {
+    console.log('received connect message from Webnative', message)
 
-    connection.update(store => ({ ...store, connected: true }))
-  } else if (event.type === 'disconnect') {
-    console.log('received disconnect message from Webnative', event)
+    const namespace = {
+      namespace: namespaceToString(message.state.app.namespace),
+      version: message.state.webnative.version
+    }
+    namespaceStore.update(store =>
+      [...store.filter(ns => ns.namespace !== namespaceToString(message.state.app.namespace)), namespace]
+    )
 
-    connection.update(store => ({ ...store, connected: false }))
-  } else if (event.type === 'session') {
-    console.log('received session event', event)
+    connectionStore.update(store => ({ ...store, connected: true }))
+  } else if (message.type === 'disconnect') {
+    console.log('received disconnect message from Webnative', message)
 
-    eventStore.update(history => [...history, event])
-  } else if (event.type === 'filesystem') {
-    console.log('received filesystem event', event)
+    connectionStore.update(store => ({ ...store, connected: false }))
+  } else if (message.type === 'session') {
+    console.log('received session message', message)
 
-    eventStore.update(history => [...history, event])
-  } else if (event.type === 'pageload') {
-    console.log('received page load event', event)
+    messageStore.update(history => [...history, message])
+  } else if (message.type === 'filesystem') {
+    console.log('received filesystem message', message)
+
+    messageStore.update(history => [...history, message])
+  } else if (message.type === 'pageload') {
+    console.log('received page load message', message)
 
     // Inject content script if missing
     backgroundPort.postMessage({
@@ -148,6 +176,6 @@ function handleBackgroundMessage(event) {
     connect()
 
   } else {
-    console.log('received an unknown message type', event)
+    console.log('received an unknown message type', message)
   }
 }
