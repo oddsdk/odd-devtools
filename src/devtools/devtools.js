@@ -168,13 +168,17 @@ function handleBackgroundMessage(message) {
   } else if (message.type === 'pageload') {
     console.log('received page load message', message)
 
+    connectionStore.update(store => ({ ...store, connected: false }))
+  } else if (message.type === 'ready') {
+    console.log('received ready message', message)
+
     // Inject content script if missing
     backgroundPort.postMessage({
       type: 'inject',
       tabId: browser.devtools.inspectedWindow.tabId
     })
-    connect()
 
+    connect()
   } else {
     console.log('received an unknown message type', message)
   }
