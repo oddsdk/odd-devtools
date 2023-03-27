@@ -22,8 +22,14 @@ browser.devtools.panels.create(
   let unsubscribeConnectionStore
   let unsubscribeMessageStore
   let unsubscribeNamespaceStore
+  let removeThemeChangeListener
 
   panel.onShown.addListener(panelWindow => {
+
+    panelWindow.setTheme(browser.devtools.panels.themeName)
+
+    browser.devtools.panels.onThemeChanged.addListener(panelWindow.setTheme)
+
     panelWindow.initializeStores({
       connection: getStore(connectionStore),
       messages: getStore(messageStore),
@@ -51,12 +57,17 @@ browser.devtools.panels.create(
     unsubscribeNamespaceStore = namespaceStore.subscribe(store => {
       panelWindow.updateNamespaces(store)
     })
+
+    removeThemeChangeListener = () => {
+      browser.devtools.panels.onThemeChanged.removeListener(panelWindow.setTheme)
+    }
   })
 
   panel.onHidden.addListener(() => {
     unsubscribeConnectionStore()
     unsubscribeMessageStore()
     unsubscribeNamespaceStore()
+    removeThemeChangeListener()
   })
 })
 
