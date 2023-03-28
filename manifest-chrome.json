@@ -3,7 +3,7 @@
   "manifest_version": 3,
   "name": "devtools-panels",
   "version": "0.0.1",
-  "author": "Jeff Griffiths",
+  "author": "brian@fission.codes",
   "homepage_url": "https://github.com/webnative-examples/webnative-devtools",
   "icons": {
     "48": "odd48.png",
