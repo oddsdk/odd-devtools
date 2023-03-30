@@ -161,8 +161,8 @@ function handleBackgroundMessage(message) {
     console.log('received session message', message)
 
     messageStore.update(history => [...history, message])
-  } else if (message.type === 'filesystem') {
-    console.log('received filesystem message', message)
+  } else if (message.type === 'fileSystem') {
+    console.log('received file system message', message)
 
     messageStore.update(history => [...history, message])
   } else if (message.type === 'pageload') {
