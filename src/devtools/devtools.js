@@ -65,7 +65,6 @@ browser.devtools.panels.create(
     unsubscribeConnectionStore()
     unsubscribeMessageStore()
     unsubscribeNamespaceStore()
-    removeThemeChangeListener()
   })
 })
 
