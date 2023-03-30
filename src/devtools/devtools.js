@@ -26,9 +26,11 @@ browser.devtools.panels.create(
 
   panel.onShown.addListener(panelWindow => {
 
+    /**
+     * on Chrome, themeName can be one of ( defauilt, dark )
+     * on Firefox, themeName can be one of ( light, dark )
+     */
     panelWindow.setTheme(browser.devtools.panels.themeName)
-
-    browser.devtools.panels.onThemeChanged.addListener(panelWindow.setTheme)
 
     panelWindow.initializeStores({
       connection: getStore(connectionStore),
@@ -57,10 +59,6 @@ browser.devtools.panels.create(
     unsubscribeNamespaceStore = namespaceStore.subscribe(store => {
       panelWindow.updateNamespaces(store)
     })
-
-    removeThemeChangeListener = () => {
-      browser.devtools.panels.onThemeChanged.removeListener(panelWindow.setTheme)
-    }
   })
 
   panel.onHidden.addListener(() => {
