@@ -96,8 +96,8 @@ export async function connect() {
   console.log('connecting to Webnative')
 
   const [connecting, err] = await browser.devtools.inspectedWindow.eval(`
-    if (window.__webnative?.extension) {
-      window.__webnative.extension.connect('${chrome.runtime.id}')
+    if (window.__odd?.extension) {
+      window.__odd.extension.connect('${chrome.runtime.id}')
       true
     } else {
       false
@@ -116,8 +116,8 @@ export async function disconnect() {
   console.log('disconnecting from Webnative')
 
   const [disconnecting, err] = await browser.devtools.inspectedWindow.eval(`
-    if (window.__webnative?.extension) {
-      window.__webnative.extension.disconnect('${chrome.runtime.id}')
+    if (window.__odd?.extension) {
+      window.__odd.extension.disconnect('${chrome.runtime.id}')
       true
     } else {
       false
@@ -146,7 +146,7 @@ function handleBackgroundMessage(message) {
 
     const namespace = {
       namespace: namespaceToString(message.state.app.namespace),
-      version: message.state.webnative.version
+      version: message.state.odd.version
     }
     namespaceStore.update(store =>
       [...store.filter(ns => ns.namespace !== namespaceToString(message.state.app.namespace)), namespace]
@@ -161,8 +161,8 @@ function handleBackgroundMessage(message) {
     console.log('received session message', message)
 
     messageStore.update(history => [...history, message])
-  } else if (message.type === 'filesystem') {
-    console.log('received filesystem message', message)
+  } else if (message.type === 'fileSystem') {
+    console.log('received file system message', message)
 
     messageStore.update(history => [...history, message])
   } else if (message.type === 'pageload') {

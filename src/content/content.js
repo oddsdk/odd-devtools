@@ -1,5 +1,5 @@
-if (!window.webnativeMessageHandlerInjected) {
-  window.webnativeMessageHandlerInjected = true
+if (!window.oddMessageHandlerInjected) {
+  window.oddMessageHandlerInjected = true
 
   window.addEventListener('message', (event) => {
     // Reject messages not from ourselves

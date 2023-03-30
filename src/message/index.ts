@@ -1,7 +1,7 @@
 import type { AppInfo } from '../namespace'
 
 export type Message = {
-  type: 'session' | 'filesystem'
+  type: 'session' | 'fileSystem'
   timestamp: number
   state: State
   detail: Detail
@@ -13,7 +13,7 @@ type State = {
     namespace: AppInfo | string
     capabilities?: Permissions
   }
-  filesystem: {
+  fileSystem: {
     dataRootCID: string | null
   }
   user: {
@@ -33,7 +33,7 @@ export function label(message: Message): string {
   let label
 
   switch (message.type) {
-    case 'filesystem':
+    case 'fileSystem':
       if (message.detail.type === 'local-change') {
         label = 'Local Change'
       } else {
