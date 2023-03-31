@@ -24,6 +24,13 @@ browser.devtools.panels.create(
   let unsubscribeNamespaceStore
 
   panel.onShown.addListener(panelWindow => {
+
+    /**
+     * on Chrome, themeName can be one of ( default, dark )
+     * on Firefox, themeName can be one of ( light, dark )
+     */
+    panelWindow.setTheme(browser.devtools.panels.themeName)
+
     panelWindow.initializeStores({
       connection: getStore(connectionStore),
       messages: getStore(messageStore),
