@@ -6,7 +6,8 @@
     clearMessages as clear,
     connectionStore,
     messageStore,
-    searchTermStore
+    searchTermStore,
+    themeStore
   } from './panel'
   import { allNamespace, namespaceToString } from '../namespace'
   import { hasMatchingTerm, type Message } from '../message'
@@ -52,16 +53,18 @@
   onDestroy(unsubscribeMessages)
 </script>
 
-<div
-  class="h-screen w-screen overflow-y-hidden grid grid-rows-[32px_auto] text-white bg-black"
->
-  <Nav connection={$connectionStore} on:clear={clearMessages} />
-  <div class="grid grid-cols-[1fr_4fr] divide-x divide-gray">
-    <Namespaces
-      messages={filteredMessages}
-      on:change={handleNamespaceChange}
-      on:clear={clearMessages}
-    />
-    <Messages messages={filteredMessages} />
+<div class:dark={$themeStore === 'dark'}>
+  <div
+    class="h-screen w-screen overflow-y-hidden grid grid-rows-[32px_auto] text-white bg-black"
+  >
+    <Nav connection={$connectionStore} on:clear={clearMessages} />
+    <div class="grid grid-cols-[1fr_4fr] divide-x divide-gray">
+      <Namespaces
+        messages={filteredMessages}
+        on:change={handleNamespaceChange}
+        on:clear={clearMessages}
+      />
+      <Messages messages={filteredMessages} />
+    </div>
   </div>
 </div>

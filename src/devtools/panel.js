@@ -12,12 +12,17 @@ export const messageStore = writable([])
 export const namespaceStore = writable([])
 export const searchTermStore = writable('')
 export const selectedMessageStore = writable(null)
+export const themeStore = writable('light')
 
 export let clearMessages
 
-// called from devtools.js in onshown
+// Called from devtools.js in onshown
 function setTheme(theme) {
-  console.log('called setTheme', theme)
+  if (theme === 'default' || theme === 'light') {
+    themeStore.set('light')
+  } else {
+    themeStore.set('dark')
+  }
 }
 
 function initializeStores(data) {
@@ -42,6 +47,7 @@ function updateNamespaces(messages) {
 
 // Stores are synced with store state in devtools.js
 window.initializeStores = initializeStores
+window.setTheme = setTheme
 window.updateConnection = updateConnection
 window.updateMessages = updateMessages
 window.updateNamespaces = updateNamespaces
