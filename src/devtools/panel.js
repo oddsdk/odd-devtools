@@ -15,6 +15,11 @@ export const selectedMessageStore = writable(null)
 
 export let clearMessages
 
+// called from devtools.js in onshown
+function setTheme(theme) {
+  console.log('called setTheme', theme)
+}
+
 function initializeStores(data) {
   connectionStore.set(data.connection)
   messageStore.set(data.messages)
