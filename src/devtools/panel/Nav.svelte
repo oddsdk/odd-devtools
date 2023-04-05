@@ -35,10 +35,12 @@
   }
 </script>
 
-<div class="grid grid-cols-[4fr_1fr] justify-center border-b border-gray">
+<div
+  class="grid grid-cols-[4fr_1fr] justify-center border-b border-gray-200 dark:border-gray-400"
+>
   <div class="flex flex-row gap-2 px-4 py-2 justify-start">
     <WebnativeIcon />
-    <span class="text-xs font-medium">
+    <span class="text-xs text-gray-500 dark:text-gray-100 font-medium">
       Webnative
       {#if connection.connected}
         Connected
@@ -53,12 +55,15 @@
       on:click={clearMessages}
       on:keypress={clearMessages}
     >
-      <span class="text-xs text-gray-light whitespace-nowrap">Clear logs</span>
+      <span class="text-xs text-gray-400 dark:text-gray-200 whitespace-nowrap">
+        Clear logs
+      </span>
       <TrashIcon />
     </div>
     <div
-      class="px-2 py-2 cursor-pointer"
-      class:bg-gray-dark={showMenu}
+      class="px-2 py-2 cursor-pointer {showMenu
+        ? 'bg-gray-200 text-gray-500'
+        : 'text-gray-500 dark:text-gray-100'}"
       on:click={toggleMenu}
       on:keypress={toggleMenu}
       use:floatingRef
@@ -70,11 +75,11 @@
 
 {#if showMenu}
   <div
-    class="flex flex-col absolute py-2 w-[248px] bg-gray-dark border border-gray"
+    class="flex flex-col absolute py-2 w-[248px] bg-gray-200 border border-gray-300"
     use:floatingContent
   >
     <a
-      class="flex flex-row gap-2 py-2 px-4 text-gray-light"
+      class="flex flex-row gap-2 py-2 px-4 text-gray-500"
       href="https://guide.fission.codes/developers/webnative"
       target="_blank"
       rel="noreferrer"
@@ -83,7 +88,7 @@
       <ExternalLink />
     </a>
     <a
-      class="flex flex-row gap-2 py-2 px-4 text-gray-light"
+      class="flex flex-row gap-2 py-2 px-4 text-gray-500"
       href="https://github.com/webnative-examples/webnative-devtools"
       target="_blank"
       rel="noreferrer"

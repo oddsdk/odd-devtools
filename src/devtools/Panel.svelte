@@ -55,10 +55,12 @@
 
 <div class:dark={$themeStore === 'dark'}>
   <div
-    class="h-screen w-screen overflow-y-hidden grid grid-rows-[32px_auto] text-white bg-black"
+    class="h-screen w-screen overflow-y-hidden grid grid-rows-[32px_auto] text-gray-400 dark:text-gray-200 bg-gray-100 dark:bg-gray-500"
   >
     <Nav connection={$connectionStore} on:clear={clearMessages} />
-    <div class="grid grid-cols-[1fr_4fr] divide-x divide-gray">
+    <div
+      class="grid grid-cols-[1fr_4fr] divide-x divide-gray-200 dark:divide-gray-400"
+    >
       <Namespaces
         messages={filteredMessages}
         on:change={handleNamespaceChange}
