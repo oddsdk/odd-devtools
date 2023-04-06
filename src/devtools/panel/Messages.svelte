@@ -110,8 +110,6 @@
           selectedMessageIndex
             ? 'bg-blue-200 dark:bg-blue-400 font-bold text-gray-500'
             : 'font-normal text-gray-300 dark:text-gray-200'}"
-          class:text-black={index === selectedMessageIndex}
-          class:text-gray-light={index !== selectedMessageIndex}
           on:click={() => selectMessage(index)}
           on:keypress={() => selectMessage(index)}
         >
@@ -163,9 +161,9 @@
 
 <style>
   .jsonview-wrapper {
-    font-family: 'IBM Plex Mono Medium';
+    font-family: 'IBM Plex Mono';
     font-size: 12px;
-    font-weight: 300;
+    font-weight: 400;
   }
 
   .jsonview-wrapper-light {

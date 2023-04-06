@@ -44,6 +44,10 @@ module.exports = {
       },
       white: '#ffffff'
     },
+    fontFamily: {
+      mono: ['IBM Plex Mono'],
+      sans: ['Apfel Grotezk']
+    },
     extend: {
       height: {
         'event-content-height': 'calc(100vh - 72px)',

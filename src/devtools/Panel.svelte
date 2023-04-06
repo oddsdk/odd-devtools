@@ -55,7 +55,7 @@
 
 <div class:dark={$themeStore === 'dark'}>
   <div
-    class="h-screen w-screen overflow-y-hidden grid grid-rows-[32px_auto] text-gray-400 dark:text-gray-200 bg-gray-100 dark:bg-gray-500"
+    class="h-screen w-screen overflow-y-hidden grid grid-rows-[32px_auto] font-sans text-gray-400 dark:text-gray-200 bg-gray-100 dark:bg-gray-500"
   >
     <Nav connection={$connectionStore} on:clear={clearMessages} />
     <div

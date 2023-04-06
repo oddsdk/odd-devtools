@@ -3,11 +3,25 @@
 @tailwind utilities;
 
 @font-face {
-  font-family: 'Uncut Sans';
-  src: url('/UncutSans-Variable.ttf') format('truetype');
+  font-family: 'Apfel Grotezk';
+  font-weight: 400;
+  src: url('/ApfelGrotezk-Regular.woff2') format('woff2');
 }
 
 @font-face {
-  font-family: 'IBM Plex Mono Medium';
-  src: url('/IBMPlexMono-Medium.ttf') format('truetype');
+  font-family: 'Apfel Grotezk';
+  font-weight: 700;
+  src: url('/ApfelGrotezk-Fett.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-weight: 300;
+  src: url('/IBMPlexMono-Light.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-weight: 400;
+  src: url('/IBMPlexMono-Regular.ttf') format('truetype');
 }

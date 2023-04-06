@@ -67,14 +67,14 @@
       <span
         class={index === selectedNamespaceIndex
           ? 'font-bold text-gray-500'
-          : 'font-medium dark:font-bold text-gray-300 dark:text-gray-200'}
+          : 'dark:font-bold text-gray-300 dark:text-gray-200'}
       >
         {namespace.namespace}
       </span>
       <span
-        class={index === selectedNamespaceIndex
+        class="font-mono {index === selectedNamespaceIndex
           ? 'font-medium dark:font-light text-gray-500'
-          : 'font-normal dark:font-light text-gray-300 dark:text-gray-200'}
+          : 'font-normal dark:font-light text-gray-300 dark:text-gray-200'}"
       >
         {#if namespace.version}
           v{namespace.version}

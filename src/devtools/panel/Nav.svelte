@@ -40,7 +40,7 @@
 >
   <div class="flex flex-row gap-2 px-4 py-2 justify-start">
     <WebnativeIcon />
-    <span class="text-xs text-gray-500 dark:text-gray-100 font-medium">
+    <span class="text-xs text-gray-500 dark:text-gray-100 font-bold">
       Webnative
       {#if connection.connected}
         Connected
