@@ -1,13 +1,18 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte'
   import { createFloatingActions } from 'svelte-floating-ui'
+  import { slide } from 'svelte/transition'
   import { offset } from 'svelte-floating-ui/dom'
 
   import { allNamespace } from '../../namespace'
+  import { themeStore } from '../panel'
   import ExternalLink from './icons/ExternalLink.svelte'
   import TrashIcon from './icons/Trash.svelte'
   import MoreVerticalIcon from './icons/MoreVertical.svelte'
-  import WebnativeIcon from './icons/Webnative.svelte'
+  import DarkOddIcon from './icons/DarkOdd.svelte'
+  import DarkNoOddIcon from './icons/DarkNoOdd.svelte'
+  import LightOddIcon from './icons/LightOdd.svelte'
+  import LightNoOddIcon from './icons/LightNoOdd.svelte'
 
   export let connection
 
@@ -39,13 +44,24 @@
   class="grid grid-cols-[4fr_1fr] justify-center border-b border-gray-200 dark:border-gray-400"
 >
   <div class="flex flex-row gap-2 px-4 py-2 justify-start">
-    <WebnativeIcon />
+    {#if connection.connected && $themeStore === 'light'}
+      <LightOddIcon />
+    {:else if connection.connected && $themeStore === 'dark'}
+      <DarkOddIcon />
+    {:else if !connection.connected && $themeStore === 'light'}
+      <LightNoOddIcon />
+    {:else if !connection.connected && $themeStore === 'dark'}
+      <DarkNoOddIcon />
+    {/if}
     <span class="text-xs text-gray-500 dark:text-gray-100 font-bold">
-      Webnative
       {#if connection.connected}
-        Connected
+        <span class="inline-block" in:slide={{ delay: 1100, duration: 300 }}>
+          ODD Code Detected
+        </span>
       {:else}
-        Not Connected
+        <span class="inline-block" out:slide={{ delay: 800, duration: 300 }}>
+          No ODD Code Detected
+        </span>
       {/if}
     </span>
   </div>
