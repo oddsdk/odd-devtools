@@ -127,7 +127,7 @@
       {/each}
     </div>
     <div
-      class="grid grid-flow-row p-4 gap-2 h-event-content-height overflow-auto"
+      class="grid grid-flow-row grid-rows-[10px_auto_10px_auto_1fr] p-4 gap-2 h-event-content-height overflow-auto"
     >
       {#if selectedMessage}
         <h4
