@@ -47,11 +47,7 @@
 
 <div
   class="grid grid-flow-col grid-cols-[1fr_16px] relative pl-4 pr-2 py-4 border-b border-gray-200 dark:border-gray-400 cursor-pointer
-  {index === selectedNamespaceIndex
-    ? $themeStore === 'light'
-      ? 'bg-blue-200'
-      : 'bg-blue-400'
-    : ''}"
+  {index === selectedNamespaceIndex ? 'bg-blue-200' : ''}"
   on:click={select}
   on:keypress={select}
 >
@@ -72,7 +68,7 @@
         {namespace.namespace}
       </span>
       <span
-        class="font-mono {index === selectedNamespaceIndex
+        class="font-mono text-[10px] {index === selectedNamespaceIndex
           ? 'font-medium dark:font-light text-gray-500'
           : 'font-normal dark:font-light text-gray-300 dark:text-gray-200'}"
       >

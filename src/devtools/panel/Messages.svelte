@@ -108,7 +108,7 @@
         <div
           class="flex flex-row gap-2 px-4 py-2 leading-[15px] border-b border-gray-200 dark:border-gray-400 cursor-pointer {index ===
           selectedMessageIndex
-            ? 'bg-blue-200 dark:bg-blue-400 font-bold text-gray-500'
+            ? 'bg-blue-200 font-bold text-gray-500'
             : 'font-normal text-gray-300 dark:text-gray-200'}"
           on:click={() => selectMessage(index)}
           on:keypress={() => selectMessage(index)}
@@ -168,17 +168,17 @@
 
   .jsonview-wrapper-light {
     color: #1b1e24;
-    --jsonBorderLeft: 1px solid #a6a9ae;
-    --jsonValStringColor: #6b65ff;
-    --jsonValColor: #be5366;
-    --jsonBracketHoverBackground: #a6a9ae;
+    --jsonBorderLeft: 1px solid #aaadc4;
+    --jsonValStringColor: #6e52fa;
+    --jsonValColor: #a6163a;
+    --jsonBracketHoverBackground: #aaadc4;
   }
 
   .jsonview-wrapper-dark {
     color: #dcdee3;
-    --jsonBorderLeft: 1px solid #494c52;
-    --jsonValStringColor: #c2c0ff;
+    --jsonBorderLeft: 1px solid #484a65;
+    --jsonValStringColor: #d4befe;
     --jsonValColor: #d28392;
-    --jsonBracketHoverBackground: #494c52;
+    --jsonBracketHoverBackground: #484a65;
   }
 </style>

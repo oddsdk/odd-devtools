@@ -96,16 +96,16 @@
   >
     <a
       class="flex flex-row gap-2 py-2 px-4 text-gray-500"
-      href="https://guide.fission.codes/developers/webnative"
+      href="https://docs.odd.dev"
       target="_blank"
       rel="noreferrer"
     >
-      Open Webnative Docs
+      Open ODD SDK Docs
       <ExternalLink />
     </a>
     <a
       class="flex flex-row gap-2 py-2 px-4 text-gray-500"
-      href="https://github.com/webnative-examples/webnative-devtools"
+      href="https://github.com/oddsdk/odd-devtools"
       target="_blank"
       rel="noreferrer"
     >

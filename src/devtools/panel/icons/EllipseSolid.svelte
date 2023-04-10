@@ -5,10 +5,5 @@
   fill="none"
   xmlns="http://www.w3.org/2000/svg"
 >
-  <circle
-    class="fill-blue-500 dark:fill-gray-100"
-    cx="6.12122"
-    cy="7.00696"
-    r="6.12122"
-  />
+  <circle class="fill-blue-500" cx="6.12122" cy="7.00696" r="6.12122" />
 </svg>
