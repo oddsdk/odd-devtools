@@ -6,8 +6,8 @@
   "author": "Jeff Griffiths",
   "homepage_url": "https://github.com/webnative-examples/webnative-devtools",
   "icons": {
-    "48": "webnative48.png",
-    "96": "webnative96.png"
+    "48": "odd48.png",
+    "96": "odd96.png"
   },
   "background": {
     "service_worker": "src/background/background.js",
