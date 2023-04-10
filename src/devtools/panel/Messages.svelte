@@ -120,7 +120,7 @@
               <EllipseOutline />
             {/if}
           </div>
-          <div>
+          <div class="text-xs">
             {label(message)}
           </div>
         </div>
