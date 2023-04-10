@@ -3,7 +3,7 @@
   import { JsonView } from '@zerodevx/svelte-json-view'
 
   import { label, type Message } from '../../message'
-  import { searchTermStore, selectedMessageStore } from '../panel'
+  import { searchTermStore, selectedMessageStore, themeStore } from '../panel'
   import EllipseOutline from './icons/EllipseOutline.svelte'
   import EllipseSolid from './icons/EllipseSolid.svelte'
   import SearchIcon from './icons/Search.svelte'
@@ -69,13 +69,17 @@
   onDestroy(unsubscribeSelecteMessageStore)
 </script>
 
-<div class="grid grid-rows-[19px_32px_auto] divide-y divide-gray">
+<div
+  class="grid grid-rows-[19px_32px_auto] divide-y divide-gray-200 dark:divide-gray-400"
+>
   <div
-    class="px-4 py-1 bg-gray-dark text-[9px] leading-[11px] font-medium uppercase"
+    class="px-4 py-1 text-[9px] leading-[11px] text-gray-500 dark:text-gray-100 font-bold uppercase"
   >
     Events
   </div>
-  <div class="flex flex-row gap-2 justify-start items-center px-4 py-2">
+  <div
+    class="flex flex-row gap-2 justify-start items-center px-4 py-2 text-gray-500 dark:text-gray-100"
+  >
     {#if $searchTermStore.length === 0}
       <SearchIcon />
     {:else}
@@ -88,7 +92,7 @@
       </span>
     {/if}
     <input
-      class="w-full bg-black text-xs text-gray-light outline-none"
+      class="w-full bg-gray-100 dark:bg-gray-500 text-xs text-gray-500 dark:text-gray-100 placeholder:text-gray-300 dark:placeholder:text-gray-200 outline-none"
       type="text"
       placeholder="Filter events..."
       spellcheck="false"
@@ -96,14 +100,16 @@
       on:input={setSearchTerm}
     />
   </div>
-  <div class="grid grid-cols-[1fr_3fr] divide-x divide-gray">
+  <div
+    class="grid grid-cols-[1fr_3fr] divide-x divide-gray-200 dark:divide-gray-400"
+  >
     <div class="pb-4 h-event-content-height overflow-y-auto">
       {#each messages as message, index}
         <div
-          class="flex flex-row gap-2 px-4 py-2 leading-[15px] border-b border-gray cursor-pointer"
-          class:bg-white={index === selectedMessageIndex}
-          class:text-black={index === selectedMessageIndex}
-          class:text-gray-light={index !== selectedMessageIndex}
+          class="flex flex-row gap-2 px-4 py-2 leading-[15px] border-b border-gray-200 dark:border-gray-400 cursor-pointer {index ===
+          selectedMessageIndex
+            ? 'bg-blue-200 font-bold text-gray-500'
+            : 'font-normal text-gray-300 dark:text-gray-200'}"
           on:click={() => selectMessage(index)}
           on:keypress={() => selectMessage(index)}
         >
@@ -114,30 +120,38 @@
               <EllipseOutline />
             {/if}
           </div>
-          <div>
+          <div class="text-xs">
             {label(message)}
           </div>
         </div>
       {/each}
     </div>
     <div
-      class="grid grid-flow-row p-4 gap-2 h-event-content-height overflow-auto"
+      class="grid grid-flow-row grid-rows-[10px_auto_10px_auto_1fr] p-4 gap-2 h-event-content-height overflow-auto"
     >
       {#if selectedMessage}
         <h4
-          class="text-[10px] leading-[12px] tracking-[0.06em] font-[573] uppercase"
+          class="text-[10px] leading-[12px] tracking-[0.06em] font-bold text-gray-500 dark:text-gray-100 uppercase"
         >
           Detail
         </h4>
-        <div class="jsonview-wrapper">
+        <div
+          class="jsonview-wrapper {$themeStore === 'light'
+            ? 'jsonview-wrapper-light'
+            : 'jsonview-wrapper-dark'}"
+        >
           <JsonView json={selectedMessage.detail} />
         </div>
         <h4
-          class="text-[10px] leading-[12px] tracking-[0.06em] font-[573] uppercase"
+          class="text-[10px] leading-[12px] tracking-[0.06em] font-bold text-gray-500 dark:text-gray-100 uppercase"
         >
           State
         </h4>
-        <div class="jsonview-wrapper">
+        <div
+          class="jsonview-wrapper {$themeStore === 'light'
+            ? 'jsonview-wrapper-light'
+            : 'jsonview-wrapper-dark'}"
+        >
           <JsonView json={selectedMessage.state} />
         </div>
       {/if}
@@ -147,11 +161,24 @@
 
 <style>
   .jsonview-wrapper {
-    font-family: 'IBM Plex Mono Medium';
+    font-family: 'IBM Plex Mono';
     font-size: 12px;
-    --jsonBorderLeft: 1px solid #4a4c50;
-    --jsonValStringColor: #657fd2;
-    --jsonValColor: #d26565;
-    --jsonBracketHoverBackground: #4a4c50;
+    font-weight: 400;
+  }
+
+  .jsonview-wrapper-light {
+    color: #1b1e24;
+    --jsonBorderLeft: 1px solid #aaadc4;
+    --jsonValStringColor: #6e52fa;
+    --jsonValColor: #a6163a;
+    --jsonBracketHoverBackground: #aaadc4;
+  }
+
+  .jsonview-wrapper-dark {
+    color: #dcdee3;
+    --jsonBorderLeft: 1px solid #484a65;
+    --jsonValStringColor: #d4befe;
+    --jsonValColor: #d28392;
+    --jsonBracketHoverBackground: #484a65;
   }
 </style>

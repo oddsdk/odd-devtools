@@ -15,8 +15,8 @@ backgroundPort.onMessage.addListener(handleBackgroundMessage)
 
 // Create a panel
 browser.devtools.panels.create(
-  'Webnative',
-  '/webnative16.png',
+  'ODD SDK',
+  '/odd48.png',
   '/src/devtools/panel.html'
 ).then(panel => {
   let unsubscribeConnectionStore

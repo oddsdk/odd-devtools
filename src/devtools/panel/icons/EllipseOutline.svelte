@@ -5,5 +5,10 @@
   fill="none"
   xmlns="http://www.w3.org/2000/svg"
 >
-  <circle cx="6.12122" cy="7.00696" r="5.62122" stroke="white" />
+  <circle
+    class="stroke-gray-200 dark:stroke-gray-400"
+    cx="6.12122"
+    cy="7.00696"
+    r="5.62122"
+  />
 </svg>
