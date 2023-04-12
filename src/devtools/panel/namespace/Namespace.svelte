@@ -63,7 +63,7 @@
       <span
         class="text-xs {index === selectedNamespaceIndex
           ? 'font-bold text-gray-500'
-          : 'dark:font-bold text-gray-300 dark:text-gray-200'}"
+          : 'text-gray-300 dark:text-gray-200'}"
       >
         {namespace.namespace}
       </span>
