@@ -63,14 +63,14 @@
       <span
         class="text-xs {index === selectedNamespaceIndex
           ? 'font-bold text-gray-500'
-          : 'dark:font-bold text-gray-300 dark:text-gray-200'}"
+          : 'text-gray-400 dark:text-gray-200'}"
       >
         {namespace.namespace}
       </span>
       <span
         class="font-mono text-[10px] {index === selectedNamespaceIndex
           ? 'font-medium dark:font-light text-gray-500'
-          : 'font-normal dark:font-light text-gray-300 dark:text-gray-200'}"
+          : 'font-normal dark:font-light text-gray-400 dark:text-gray-200'}"
       >
         {#if namespace.version}
           v{namespace.version}
@@ -85,7 +85,7 @@
       class="grid grid-flow-row justify-end items-center cursor-pointer {index ===
       selectedNamespaceIndex
         ? 'text-gray-500'
-        : 'text-gray-300'}"
+        : 'text-gray-400 dark:text-gray-300'}"
       on:click|stopPropagation={openMenu}
       on:keypress|stopPropagation={openMenu}
     >
@@ -93,7 +93,7 @@
     </div>
     {#if showMenu}
       <div
-        class="flex flex-col absolute right-0 top-3 py-2 z-10 text-white bg-gray-200 border border-r-0 border-gray-300"
+        class="flex flex-col absolute right-0 top-3 py-2 z-10 text-white bg-gray-200 border border-r-0 border-gray-400 dark:border-gray-300"
       >
         <div
           class="flex flex-col items-end pr-2 py-[3px] text-gray-500 cursor-pointer"

@@ -91,7 +91,7 @@
 
 {#if showMenu}
   <div
-    class="flex flex-col absolute py-2 w-[248px] bg-gray-200 border border-gray-300"
+    class="flex flex-col absolute py-2 w-[248px] bg-gray-200 border border-gray-400 dark:border-gray-300"
     use:floatingContent
   >
     <a
