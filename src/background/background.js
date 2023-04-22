@@ -1,4 +1,4 @@
-let devtoolsPort
+const devtoolsPorts = {}
 
 console.log('In background.js')
 
@@ -23,14 +23,12 @@ function devtoolsHandler(data) {
  * Set up port communication from the content script to the devtools page and back again
  */
 function connectionListener(port) {
-  // console.log(`connection from ${port.name}`)
+  const [prefix, tabId] = port.name.split('-')
 
-  if (port.name === 'devtools-page') {
-    // handle  requests from the devtools page
-    devtoolsPort = port
-    devtoolsPort.onMessage.addListener(devtoolsHandler)
+  if (prefix === 'odd_devtools') {
+    devtoolsPorts[`${tabId}`] = port
+    devtoolsPorts[`${tabId}`].onMessage.addListener(devtoolsHandler)
   }
-
 }
 
 chrome.runtime.onConnect.addListener(connectionListener)
@@ -39,13 +37,19 @@ chrome.runtime.onConnect.addListener(connectionListener)
  * Listen for messages from the content script.
  * Wakes up the background service worker if it has been deactivated.
  */
-chrome.runtime.onMessage.addListener(message => {
-  // console.log('message in background script', message)
+chrome.runtime.onMessage.addListener((message, sender) => {
+  const tabId = sender.tab?.id
+
+  // Messages may come from places other than tabs or
+  // be missing an id. Ignore these.
+  if (!tabId) return
+
+  // console.log('message from tabId', tabId, 'in background script', message)
 
   // Rewire the connection with the devtools panel
-  if (!devtoolsPort) {
-    devtoolsPort = chrome.runtime.connect({ name: 'background' })
+  if (!devtoolsPorts[`${tabId}`]) {
+    devtoolsPorts[`${tabId}`] = chrome.runtime.connect({ name: `odd_background-${tabId}`})
   }
 
-  devtoolsPort.postMessage(message)
+  devtoolsPorts[`${tabId}`].postMessage(message)
 })

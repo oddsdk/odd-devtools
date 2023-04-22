@@ -10,7 +10,7 @@ const tabId = browser.devtools.inspectedWindow.tabId
 // INIT 
 
 // Connect with the background script
-let backgroundPort = browser.runtime.connect({ name: 'devtools-page' })
+let backgroundPort = browser.runtime.connect({ name: `odd_devtools-${tabId}` })
 backgroundPort.onMessage.addListener(handleBackgroundMessage)
 
 // Create a panel
@@ -86,7 +86,7 @@ connect()
 function handleBackgroundConnection(port) {
   // console.log('connection in devtools page from ', port.name)
 
-  if (port.name === 'background') {
+  if (port.name === `odd_background-${tabId}`) {
     backgroundPort = port
     backgroundPort.onMessage.addListener(handleBackgroundMessage)
   }
@@ -146,7 +146,7 @@ export const messageStore = writable([])
 export const namespaceStore = writable([])
 
 function handleBackgroundMessage(message) {
-  // console.log('devtools port onMessage', message)
+  // console.log('message received from tab', tabId,'in devtools panel', message)
 
   if (message.type === 'connect') {
     console.log('received connect message from Webnative', message)
