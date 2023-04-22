@@ -9,7 +9,6 @@ export type Message = {
 
 type State = {
   app: {
-    version: string
     namespace: AppInfo | string
     capabilities?: Permissions
   }
@@ -20,6 +19,9 @@ type State = {
     username: string | null
     accountDID: string | null
     agentDID: string
+  }
+  odd: {
+    version: string
   }
 }
 
