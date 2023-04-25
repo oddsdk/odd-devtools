@@ -1,4 +1,9 @@
+// Emit load on script injection
 chrome.runtime.sendMessage({ id: `${chrome.runtime.id}`, type: 'pageload' })
+
+window.addEventListener('pageshow', () => {
+  chrome.runtime.sendMessage({ id: `${chrome.runtime.id}`, type: 'pageload' })
+})
 
 window.addEventListener('message', (event) => {
   // Reject messages not from ourselves
