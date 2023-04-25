@@ -188,7 +188,7 @@ function handleBackgroundMessage(message) {
       if (!connection.connected) {
         connectionStore.update(store => ({ ...store, error: 'DebugModeOff' }))
       }
-    }, 500)
+    }, 1000)
   } else if (message.type === 'ready') {
     console.log('received ready message', message)
 
