@@ -6,8 +6,10 @@
   "author": "brian@fission.codes",
   "homepage_url": "https://github.com/oddsdk/odd-devtools",
   "icons": {
+    "16": "odd16.png",
+    "32": "odd32.png",
     "48": "odd48.png",
-    "96": "odd96.png"
+    "128": "odd128.png"
   },
   "background": {
     "service_worker": "src/background/background.js",
