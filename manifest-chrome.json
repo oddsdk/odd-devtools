@@ -31,9 +31,7 @@
     "http://localhost/*"
   ],
   "permissions": [
-    "activeTab",
-    "scripting",
-    "storage"
+    "scripting"
   ],
   "externally_connectable": {
     "matches": [

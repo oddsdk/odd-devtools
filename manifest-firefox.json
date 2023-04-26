@@ -29,9 +29,7 @@
     "http://localhost/*"
   ],
   "permissions": [
-    "activeTab",
-    "scripting",
-    "storage"
+    "scripting"
   ],
   "web_accessible_resources": [
     {
