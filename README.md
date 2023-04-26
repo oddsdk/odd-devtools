@@ -1,6 +1,6 @@
-# Webnative Devtools
+# ODD Devtools
 
-> A browser devtools extension to help developers who are using the [Webnative SDK](https://webnative.dev/)
+> A browser devtools extension to help developers who are using the [ODD SDK](https://odd.dev/)
 
 ## Set up
 
@@ -26,9 +26,9 @@ The Chrome extension can be loaded at `chrome://extensions/`. Make sure the "Dev
 
 Select "Load unpacked". Find the directory with the built Chrome extension and select it.
 
-Open a web app that is using Webnative with `debug` set to `true`. In the devtools, select the Webnative panel. The devtools will attempt to connect to Webnative when the panel is shown. It will attempt to disconnect when another panel is shown or the devtools are closed.
+Open a web app that is using ODD SDK with `debug` set to `true`. In the devtools, select the ODD SDK panel. The devtools will connect to ODD SDK when the panel is shown and on page reloads.
 
-The extension will listen for `data` messages after the extension has successfully connected with Webnative.
+The extension will listen for `data` messages after the extension has successfully connected with the ODD SDK.
 
 ### Firefox
 

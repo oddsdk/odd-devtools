@@ -74,7 +74,7 @@ backgroundPort.postMessage({
   tabId
 })
 
-// Connect with Webnative
+// Connect with ODD SDK
 connect()
 
 
@@ -95,12 +95,12 @@ function handleBackgroundConnection(port) {
 chrome.runtime.onConnect.addListener(handleBackgroundConnection)
 
 
-// WEBNATIVE CONNECTION
+// ODD SDK CONNECTION
 
 export const connectionStore = writable({ tabId, connected: false, error: null })
 
 export async function connect() {
-  console.log('connecting to Webnative')
+  console.log('Connecting to the ODD SDK')
 
   const [connecting, err] = await browser.devtools.inspectedWindow.eval(`
     if (window.__odd?.extension) {
@@ -122,7 +122,7 @@ export async function connect() {
 }
 
 export async function disconnect() {
-  console.log('disconnecting from Webnative')
+  console.log('Disconnecting from the ODD SDK')
 
   const [disconnecting, err] = await browser.devtools.inspectedWindow.eval(`
     if (window.__odd?.extension) {
@@ -153,7 +153,7 @@ function handleBackgroundMessage(message) {
   // console.log('message received from tab', tabId,'in devtools panel', message)
 
   if (message.type === 'connect') {
-    console.log('received connect message from Webnative', message)
+    console.log('Received connect message from the ODD SDK', message)
 
     const namespace = {
       namespace: namespaceToString(message.state.app.namespace),
@@ -165,19 +165,19 @@ function handleBackgroundMessage(message) {
 
     connectionStore.update(store => ({ ...store, connected: true }))
   } else if (message.type === 'disconnect') {
-    console.log('received disconnect message from Webnative', message)
+    console.log('Received disconnect message from the ODD SDK', message)
 
     connectionStore.update(store => ({ ...store, connected: false }))
   } else if (message.type === 'session') {
-    console.log('received session message', message)
+    console.log('Received session message', message)
 
     messageStore.update(history => [...history, message])
   } else if (message.type === 'fileSystem') {
-    console.log('received file system message', message)
+    console.log('Received file system message', message)
 
     messageStore.update(history => [...history, message])
   } else if (message.type === 'pageload') {
-    console.log('received page load message', message)
+    console.log('Received page load message', message)
 
     connectionStore.update(store => ({ ...store, connected: false }))
 
@@ -190,7 +190,7 @@ function handleBackgroundMessage(message) {
       }
     }, 1000)
   } else if (message.type === 'ready') {
-    console.log('received ready message', message)
+    console.log('Received ready message', message)
 
     // Inject content script if missing
     backgroundPort.postMessage({
@@ -200,6 +200,6 @@ function handleBackgroundMessage(message) {
 
     connect()
   } else {
-    console.log('received an unknown message type', message)
+    console.warn('Received an unknown message type', message)
   }
 }
