@@ -45,8 +45,7 @@
   "web_accessible_resources": [
     {
       "resources": [
-        "src/content/content.js",
-        "src/content/page-load.js"
+        "src/content/content.js"
       ],
       "matches": ["https://*/*"],
       "extension_ids": []
