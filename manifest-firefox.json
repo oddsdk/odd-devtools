@@ -18,7 +18,8 @@
     {
       "matches": [
         "https://*/*",
-        "http://localhost/*"
+        "http://localhost/*",
+        "http://127.0.0.1/*"
       ],
       "js": ["src/content/page-load.js"]
     }
@@ -26,7 +27,8 @@
   "devtools_page": "src/devtools/devtools.html",
   "host_permissions": [
     "https://*/*",
-    "http://localhost/*"
+    "http://localhost/*",
+    "http://127.0.0.1/*"
   ],
   "permissions": [
     "scripting"
