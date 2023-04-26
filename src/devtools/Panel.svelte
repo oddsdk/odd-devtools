@@ -11,6 +11,8 @@
   } from './panel'
   import { allNamespace, namespaceToString } from '../namespace'
   import { hasMatchingTerm, type Message } from '../message'
+  import ConnectionFailed from './panel/errors/ConnectionFailed.svelte'
+  import DebugOff from './panel/errors/DebugOff.svelte'
   import Messages from './panel/Messages.svelte'
   import Namespaces from './panel/Namespaces.svelte'
   import Nav from './panel/Nav.svelte'
@@ -58,15 +60,21 @@
     class="h-screen w-screen overflow-y-hidden grid grid-rows-[32px_auto] font-sans text-gray-400 dark:text-gray-200 bg-gray-100 dark:bg-gray-500"
   >
     <Nav connection={$connectionStore} on:clear={clearMessages} />
-    <div
-      class="grid grid-cols-[1fr_4fr] divide-x divide-gray-200 dark:divide-gray-400"
-    >
-      <Namespaces
-        messages={filteredMessages}
-        on:change={handleNamespaceChange}
-        on:clear={clearMessages}
-      />
-      <Messages messages={filteredMessages} />
-    </div>
+    {#if !$connectionStore.error}
+      <div
+        class="grid grid-cols-[1fr_4fr] divide-x divide-gray-200 dark:divide-gray-400"
+      >
+        <Namespaces
+          messages={filteredMessages}
+          on:change={handleNamespaceChange}
+          on:clear={clearMessages}
+        />
+        <Messages messages={filteredMessages} />
+      </div>
+    {:else if $connectionStore.error === 'DebugModeOff'}
+      <DebugOff />
+    {:else}
+      <ConnectionFailed error={$connectionStore.error} />
+    {/if}
   </div>
 </div>

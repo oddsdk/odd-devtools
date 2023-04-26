@@ -114,8 +114,10 @@ export async function connect() {
   if (!connecting) {
     connectionStore.update(store => ({ ...store, error: 'DebugModeOff' }))
   } else if (err) {
-    connectionStore.update(store => ({ ...store, error: 'EvalFailed' }))
     console.error('Inspected window eval error: ', err)
+    connectionStore.update(store => ({ ...store, error: `Could not connect: ${err}` }))
+  } else {
+    connectionStore.update(store => ({ ...store, error: null }))
   }
 }
 
@@ -134,8 +136,10 @@ export async function disconnect() {
   if (!disconnecting) {
     connectionStore.update(store => ({ ...store, error: 'DebugModeOff' }))
   } else if (err) {
-    connectionStore.update(store => ({ ...store, error: 'EvalFailed' }))
     console.error('Inspected window eval error: ', err)
+    connectionStore.update(store => ({ ...store, error: `Could not connect: ${err}` }))
+  } else {
+    connectionStore.update(store => ({ ...store, error: null }))
   }
 }
 
@@ -176,6 +180,15 @@ function handleBackgroundMessage(message) {
     console.log('received page load message', message)
 
     connectionStore.update(store => ({ ...store, connected: false }))
+
+    // Assume debug mode off if no connect message received
+    setTimeout(() => {
+      const connection = getStore(connectionStore)
+
+      if (!connection.connected) {
+        connectionStore.update(store => ({ ...store, error: 'DebugModeOff' }))
+      }
+    }, 1000)
   } else if (message.type === 'ready') {
     console.log('received ready message', message)
 
