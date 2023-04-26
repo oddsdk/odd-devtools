@@ -4,7 +4,7 @@
   "name": "ODD Devtools",
   "version": "0.1.0",
   "author": "brian@fission.codes",
-  "homepage_url": "https://github.com/webnative-examples/webnative-devtools",
+  "homepage_url": "https://github.com/oddsdk/odd-devtools",
   "icons": {
     "48": "odd48.png",
     "96": "odd96.png"
