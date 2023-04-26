@@ -1,10 +1,6 @@
 const devtoolsPorts = {}
 
-console.log('In background.js')
-
 function injector(tabId) {
-  // console.log('Attempting to inject content script.')
-
   chrome.scripting.executeScript({
     target: { tabId },
     files: ['/src/content/content.js'],
@@ -12,8 +8,6 @@ function injector(tabId) {
 }
 
 function devtoolsHandler(data) {
-  // console.log('devtools handler called with', data)
-
   if (data.type === 'inject') {
     injector(data.tabId)
   }
@@ -43,8 +37,6 @@ chrome.runtime.onMessage.addListener((message, sender) => {
   // Messages may come from places other than tabs or
   // be missing an id. Ignore these.
   if (!tabId) return
-
-  // console.log('message from tabId', tabId, 'in background script', message)
 
   // Rewire the connection with the devtools panel
   if (!devtoolsPorts[`${tabId}`]) {

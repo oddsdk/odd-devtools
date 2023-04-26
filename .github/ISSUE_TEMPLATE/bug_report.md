@@ -32,7 +32,7 @@ A clear and concise description of what the bug is.
 Steps to reproduce the behavior. For example:
 
 1. Run '...'
-2. Open the Webnative devtools panel
+2. Open the ODD devtools panel
 4. See error
 
 **Expected behavior**

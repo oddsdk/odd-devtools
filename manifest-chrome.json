@@ -1,13 +1,16 @@
 {
-  "description": "Adds a new panel to the developer tools. The panel contains buttons that demonstrate various basic features of the devtools API.",
+  "description": "Developer tools for debugging ODD applications.",
   "manifest_version": 3,
-  "name": "devtools-panels",
-  "version": "0.0.1",
-  "author": "Jeff Griffiths",
-  "homepage_url": "https://github.com/webnative-examples/webnative-devtools",
+  "name": "ODD Devtools",
+  "version": "0.1.0",
+  "version_name": "0.1.0 beta",
+  "author": "brian@fission.codes",
+  "homepage_url": "https://github.com/oddsdk/odd-devtools",
   "icons": {
+    "16": "odd16.png",
+    "32": "odd32.png",
     "48": "odd48.png",
-    "96": "odd96.png"
+    "128": "odd128.png"
   },
   "background": {
     "service_worker": "src/background/background.js",
@@ -20,7 +23,8 @@
     {
       "matches": [
         "https://*/*",
-        "http://localhost/*"
+        "http://localhost/*",
+        "http://127.0.0.1/*"
       ],
       "js": ["src/content/page-load.js"]
     }
@@ -28,12 +32,11 @@
   "devtools_page": "src/devtools/devtools.html",
   "host_permissions": [
     "https://*/*",
-    "http://localhost/*"
+    "http://localhost/*",
+    "http://127.0.0.1/*"
   ],
   "permissions": [
-    "activeTab",
-    "scripting",
-    "storage"
+    "scripting"
   ],
   "externally_connectable": {
     "matches": [
@@ -43,8 +46,7 @@
   "web_accessible_resources": [
     {
       "resources": [
-        "src/content/content.js",
-        "src/content/page-load.js"
+        "src/content/content.js"
       ],
       "matches": ["https://*/*"],
       "extension_ids": []
