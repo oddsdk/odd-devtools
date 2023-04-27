@@ -1,10 +1,10 @@
 # Privacy Policy
 
-This policy describes our privacy practices for information that's collected by the ODD Devtools browser extension. We may occassionally update this document or relevant user interfaces to reflect changes in the information that we collect or new products or technologies we release. However, any changes will be consistent with Fission's mission to give user's control of their data and respect their privacy.
+This policy describes our privacy practices for information that's collected by the ODD Devtools browser extension. We may occasionally update this document or relevant user interfaces to reflect changes in the information we collect or new products or technologies we release. However, any changes will be consistent with Fission's mission to give users control of their data and respect their privacy.
 
 Unless otherwise specified, this policy does not apply to projects run by individuals or organizations outside of Fission, such as IPFS, even if we promote the use of those projects or happen to contribute to them.
 
-ODD Devtools are distributed from a multiple sources, including the Chrome Web Store, addons.mozilla.org, and Github. If you download ODD Devtools from one of these sites, your interaction with that site is governed by its privacy policy, which may be less protective than Fission's policies. Fission cannot supervise or control the use of personal information by non-Fission software download sources.
+ODD Devtools are distributed from multiple sources, including the Chrome Web Store, addons.mozilla.org, and Github. If you download ODD Devtools from one of these sites, your interaction with that site is governed by its privacy policy, which may be less protective than Fission's policies. Fission cannot supervise or control the use of personal information by non-Fission software download sources.
 
 ## Bug reports
 
@@ -20,7 +20,7 @@ Information is only collected in public bug reports on Github. Disclosure of thi
 
 ## Updating or Removing Your Information
 
-We endeavor not to collect personal data from users, but recognize that you may choose to provide such information in a bug report. You may choose to correct, update, access or delete the personal information you have submitted directly on Github or by sending an email to support@fission.codes.
+We endeavor not to collect personal data from users but recognize that you may choose to provide such information in a bug report. You may choose to correct, update, access, or delete the personal information you have submitted directly on Github or by sending an email to support@fission.codes.
 
 ## Data Storage and Retention
 
