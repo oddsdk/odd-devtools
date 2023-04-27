@@ -1,6 +1,6 @@
 # Privacy Policy
 
-This policy describes our privacy practices for information that's collected by the ODD Devtools browser extension. We may occassionally udpate this document or relevant user interfaces to reflect changes in the information that we collect or new products or technologies we release. However, any changes will be consistent with Fission's mission to give user's control of their data and respect their privacy.
+This policy describes our privacy practices for information that's collected by the ODD Devtools browser extension. We may occassionally update this document or relevant user interfaces to reflect changes in the information that we collect or new products or technologies we release. However, any changes will be consistent with Fission's mission to give user's control of their data and respect their privacy.
 
 Unless otherwise specified, this policy does not apply to projects run by individuals or organizations outside of Fission, such as IPFS, even if we promote the use of those projects or happen to contribute to them.
 
