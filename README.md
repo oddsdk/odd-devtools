@@ -41,3 +41,12 @@ The extension will listen for messages after the extension has successfully conn
 The Firefox extension can be loaded at `about:debugging`. Select "This Firefox", then "Load Temporary Add-on". Find the directory with the Firefox build and select `manifest.json` and "Open".
 
 Firefox requires an extra permission step. Open `about:addons` and find the extension. Select it and in the permissions tab toggle "Access your data for all websites" on.
+
+
+#### Notes to reviewer
+
+This extension was built on macOS Ventura version 13.3.1 (a). The build used `npm` at version 8.15.0 and node at `v18.7.0`.
+
+The extension is compiled using Vite configured by `vite.chrome.config.ts` and `vite.firefox.config.ts`. Vite emits distributions for Firefox and Chrome in `dist/firefox` and `dist/chrome` respectively.
+
+All utilities necessary for building the extension are installed by running `npm install`.
