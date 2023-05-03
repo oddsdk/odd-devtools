@@ -42,5 +42,11 @@
       ],
       "matches": ["https://*/*"]
     }
-  ]
+  ],
+  "browser_specific_settings": {
+    "gecko": {
+      "strict_min_version": "109.0",
+      "id": "odd-devtools@fission"
+    }
+  }
 }

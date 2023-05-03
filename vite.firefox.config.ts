@@ -17,7 +17,7 @@ export default defineConfig({
         panel: resolve('./src/devtools/panel.html'),
       },
     },
-    sourcemap: true
+    sourcemap: false
   },
   plugins: [
     svelte(),
