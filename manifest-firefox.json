@@ -2,7 +2,7 @@
   "description": "Developer tools for debugging ODD applications.",
   "manifest_version": 3,
   "name": "ODD Devtools",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "developer": {
     "name": "Fission",
     "url": "https://github.com/oddsdk/odd-devtools"
