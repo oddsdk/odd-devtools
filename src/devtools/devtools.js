@@ -168,7 +168,7 @@ function handleBackgroundMessage(message) {
       if (!connection.connected) {
         connectionStore.update(store => ({ ...store, error: 'DebugModeOff' }))
       }
-    }, 1000)
+    }, 2000)
   } else if (message.type === 'ready') {
     // Inject content script if missing
     backgroundPort.postMessage({
