@@ -2,7 +2,12 @@
   import { onDestroy } from 'svelte'
   import { JsonView } from '@zerodevx/svelte-json-view'
 
-  import { label, type Message } from '../../message'
+  import {
+    getDisplayMessage,
+    label,
+    type DisplayMessage,
+    type Message
+  } from '../../message'
   import { searchTermStore, selectedMessageStore, themeStore } from '../panel'
   import EllipseOutline from './icons/EllipseOutline.svelte'
   import EllipseSolid from './icons/EllipseSolid.svelte'
@@ -13,17 +18,21 @@
 
   let selectedMessageIndex = 0
   let selectedMessage: Message
+  let displayMessage: DisplayMessage
 
+  // Selected message may be set by namespace "Jump to most recent event" control
   const unsubscribeSelecteMessageStore = selectedMessageStore.subscribe(
     selected => {
       selectedMessageIndex = selected
       selectedMessage = messages[selectedMessageIndex]
+      displayMessage = getDisplayMessage(selectedMessage)
     }
   )
 
   function selectMessage(index: number) {
     selectedMessageIndex = index
     selectedMessage = messages[selectedMessageIndex]
+    displayMessage = getDisplayMessage(selectedMessage)
   }
 
   function setSearchTerm(event: { currentTarget: HTMLInputElement }) {
@@ -127,32 +136,44 @@
       {/each}
     </div>
     <div
-      class="grid grid-flow-row grid-rows-[10px_auto_10px_auto_1fr] p-4 gap-2 h-event-content-height overflow-auto"
+      class="grid grid-flow-row grid-rows-[10px_auto_10px_auto_10px_auto_1fr] p-4 gap-2 h-event-content-height overflow-auto"
     >
       {#if selectedMessage}
         <h4
           class="text-[10px] leading-[12px] tracking-[0.06em] font-bold text-gray-500 dark:text-gray-100 uppercase"
         >
-          Detail
+          Event Detail
         </h4>
         <div
           class="jsonview-wrapper {$themeStore === 'light'
             ? 'jsonview-wrapper-light'
             : 'jsonview-wrapper-dark'}"
         >
-          <JsonView json={selectedMessage.detail} />
+          <JsonView json={displayMessage.detail} />
         </div>
         <h4
           class="text-[10px] leading-[12px] tracking-[0.06em] font-bold text-gray-500 dark:text-gray-100 uppercase"
         >
-          State
+          User
         </h4>
         <div
           class="jsonview-wrapper {$themeStore === 'light'
             ? 'jsonview-wrapper-light'
             : 'jsonview-wrapper-dark'}"
         >
-          <JsonView json={selectedMessage.state} />
+          <JsonView json={displayMessage.user} />
+        </div>
+        <h4
+          class="text-[10px] leading-[12px] tracking-[0.06em] font-bold text-gray-500 dark:text-gray-100 uppercase"
+        >
+          File System
+        </h4>
+        <div
+          class="jsonview-wrapper {$themeStore === 'light'
+            ? 'jsonview-wrapper-light'
+            : 'jsonview-wrapper-dark'}"
+        >
+          <JsonView json={displayMessage.fileSystem} />
         </div>
       {/if}
     </div>
@@ -170,6 +191,7 @@
     color: #1b1e24;
     --jsonBorderLeft: 1px solid #aaadc4;
     --jsonValStringColor: #6649f8;
+    --jsonValNumberColor: #0f9162;
     --jsonValColor: #a6163a;
     --jsonBracketHoverBackground: #aaadc4;
   }
@@ -178,6 +200,7 @@
     color: #dcdee3;
     --jsonBorderLeft: 1px solid #484a65;
     --jsonValStringColor: #d5c3fd;
+    --jsonValNumberColor: #b1d9ca;
     --jsonValColor: #d28392;
     --jsonBracketHoverBackground: #484a65;
   }
