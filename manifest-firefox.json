@@ -1,6 +1,6 @@
 {
   "description": "Developer tools for debugging ODD applications.",
-  "manifest_version": 3,
+  "manifest_version": 2,
   "name": "ODD Devtools",
   "version": "0.2.0",
   "developer": {
@@ -27,21 +27,14 @@
     }
   ],
   "devtools_page": "src/devtools/devtools.html",
-  "host_permissions": [
+  "permissions": [
+    "scripting",
     "https://*/*",
     "http://localhost/*",
     "http://127.0.0.1/*"
   ],
-  "permissions": [
-    "scripting"
-  ],
   "web_accessible_resources": [
-    {
-      "resources": [
-        "src/content/content.js"
-      ],
-      "matches": ["https://*/*"]
-    }
+    "src/content/content.js"
   ],
   "browser_specific_settings": {
     "gecko": {
