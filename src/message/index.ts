@@ -40,7 +40,7 @@ function isFileSystemDetail(detail: unknown): detail is FileSystemDetail {
   return (
     detail !== null &&
     typeof detail === 'object' &&
-    typeof detail['root'] === 'string'
+    typeof detail[ 'root' ] === 'string'
   )
 }
 
@@ -54,7 +54,10 @@ export type DisplayMessage = {
   { type: 'local-change', localRootCID: string, path: object } |
   { type: 'publish', localRootCID: string }
   user: State[ 'user' ]
-  fileSystem: { publishedRootCID: string }
+  fileSystem: {
+    localRootCID: string
+    publishedRootCID: string
+  }
 }
 
 export function label(message: Message): string {
@@ -84,29 +87,36 @@ export function getDisplayMessage(message: Message): DisplayMessage {
   if (!message) return
 
   let detail
+  let fileSystem
 
   if (isFileSystemDetail(message.detail)) {
     detail = {
-      timestamp: message.timestamp,
-      localRootCID: message.detail.root
+      timestamp: message.timestamp
     }
 
     if (message.detail.type === 'local-change') {
-      detail['path'] = message.detail.path
+      detail[ 'path' ] = message.detail.path
+    }
+
+    fileSystem = {
+      localRootCID: message.detail.root,
+      publishedRootCID: message.state.fileSystem.dataRootCID
     }
   } else {
     detail = {
       timestamp: message.timestamp,
       username: message.detail.username
     }
+
+    fileSystem = {
+      publishedRootCID: message.state.fileSystem.dataRootCID
+    }
   }
 
   return {
     detail,
     user: message.state.user,
-    fileSystem: {
-      publishedRootCID: message.state.fileSystem.dataRootCID
-    }
+    fileSystem
   }
 }
 
