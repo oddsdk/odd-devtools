@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Firefox incorrectly displays not connected view. Increased connection check timeout.
 
+### Changed
+
+- Rearrange state in event payload to present information more clearly and remove redundancy.
+
 ## [0.1.0] - 2023-03-05
 
 ### Added
